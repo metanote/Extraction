@@ -39,14 +39,15 @@ public class ExtractTemporalFact {
 					for (String z : tp)
 						if (x.length() < 25)
 							if (x.toLowerCase().contains(z)) {
-
-								facts.add(x.replace(z, ""));
+								String ch = x.replace(z, "");
+								String ch2= ch.replace("\"", "");
+								facts.add(ch2);
 								boolean bon = true;
 								for (String e : temporalFacts)
 									if (x.equalsIgnoreCase(e))
 										bon = false;
 								if (bon)
-									temporalFacts.add(x);
+									temporalFacts.add(x.replace("\"", ""));
 
 							}
 				}
@@ -80,7 +81,7 @@ public class ExtractTemporalFact {
 					if (bon) {
 						String f = x.replace(z, "");
 						if (f.length() != 0)
-							facts.add(f);
+							facts.add(f.replace("\"", ""));
 
 					}
 				}

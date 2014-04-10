@@ -61,7 +61,7 @@ public class ExtractRelatedFacts {
 
 		for (String s : listRelaFacts) {
 			if (!listTempFacts.contains(s)) {
-				temp.add(s);
+				temp.add(s.replace("\"", ""));
 			}
 		}
 		listRelaFacts.clear();
