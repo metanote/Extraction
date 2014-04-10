@@ -26,19 +26,19 @@ public class ExtractRelatedFacts {
 
 				for (String x : splitLine) {
 					for (String y : temporalFact)
-
-						if (x.toLowerCase().matches(
-								"(.*)" + y.toLowerCase() + "(.*)")) {
-							relatedFacts.add(x);
-
-							boolean bon = true;
-							for (String e : relatedFacts)
-								if (x.equalsIgnoreCase(e))
-									bon = false;
-							if (bon)
+						if (x.length() < 25)
+							if (x.toLowerCase().matches(
+									"(.*)" + y.toLowerCase() + "(.*)")) {
 								relatedFacts.add(x);
 
-						}
+								boolean bon = true;
+								for (String e : relatedFacts)
+									if (x.equalsIgnoreCase(e))
+										bon = false;
+								if (bon)
+									relatedFacts.add(x);
+
+							}
 				}
 				if (relatedFacts.size() > 0) {
 					mp.put(i, relatedFacts);
@@ -57,15 +57,15 @@ public class ExtractRelatedFacts {
 
 	public ArrayList<String> relatedFactsWithoutTemp(
 			ArrayList<String> listRelaFacts, ArrayList<String> listTempFacts) {
-		  ArrayList<String> temp = new ArrayList<String>();
+		ArrayList<String> temp = new ArrayList<String>();
 
-	        for(String s : listRelaFacts) {
-	            if(!listTempFacts.contains(s)) {
-	                temp.add(s);
-	            } 
-	        }
-	        listRelaFacts.clear();
-	        listRelaFacts.addAll(temp);
+		for (String s : listRelaFacts) {
+			if (!listTempFacts.contains(s)) {
+				temp.add(s);
+			}
+		}
+		listRelaFacts.clear();
+		listRelaFacts.addAll(temp);
 
 		// TODO Auto-generated method stub
 		return listRelaFacts;

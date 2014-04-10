@@ -3,7 +3,6 @@ package mining;
 import java.io.*;
 import java.util.*;
 
-
 public class ExtractTemporalFact {
 	// lire les données à partir d'un fichier
 	// lire ligne par ligne et extraire des attribut temporels
@@ -11,7 +10,8 @@ public class ExtractTemporalFact {
 	ArrayList<String> facts = new ArrayList<String>();
 
 	HashMap<Integer, ArrayList<String>> mp = new HashMap<Integer, ArrayList<String>>();
-	private ArrayList<String> newListFact=new ArrayList<String>();
+	private ArrayList<String> newListFact = new ArrayList<String>();
+
 	public ArrayList<String> putTemporalPoss() {
 		ArrayList<String> temporalPossibilities = new ArrayList<String>();
 
@@ -37,18 +37,18 @@ public class ExtractTemporalFact {
 
 				for (String x : splitLine) {
 					for (String z : tp)
+						if (x.length() < 25)
+							if (x.toLowerCase().contains(z)) {
 
-						if (x.toLowerCase().contains(z)) {
+								facts.add(x.replace(z, ""));
+								boolean bon = true;
+								for (String e : temporalFacts)
+									if (x.equalsIgnoreCase(e))
+										bon = false;
+								if (bon)
+									temporalFacts.add(x);
 
-							facts.add(x.replace(z, ""));
-							boolean bon = true;
-							for (String e : temporalFacts)
-								if (x.equalsIgnoreCase(e))
-									bon = false;
-							if (bon)
-								temporalFacts.add(x);
-
-						}
+							}
 				}
 				if (temporalFacts.size() > 0) {
 					mp.put(i, temporalFacts);
@@ -67,7 +67,7 @@ public class ExtractTemporalFact {
 
 	public ArrayList<String> readFileFacts(ArrayList<String> temporalFacts) {
 		ArrayList<String> tp = putTemporalPoss();
-		
+
 		for (String x : temporalFacts) {
 			for (String z : tp)
 
@@ -86,35 +86,34 @@ public class ExtractTemporalFact {
 				}
 		}
 
-		
 		int j = 0;
 		String s = facts.get(j);
-		while(j<facts.size()) {
+		while (j < facts.size()) {
 			j++;
 			for (int i = j; i < facts.size(); i++) {
-				if (!s.equalsIgnoreCase("")&&(facts.get(i)!=s))
+				if (!s.equalsIgnoreCase("") && (facts.get(i) != s))
 					newListFact.add(s);
-				
+
 			}
-			if (j<facts.size())
-			s = facts.get(j);
+			if (j < facts.size())
+				s = facts.get(j);
 		}
-		
-		
+
 		return removeDuplicates(newListFact);
 
 	}
+
 	public static ArrayList<String> removeDuplicates(ArrayList<String> list) {
-        ArrayList<String> temp = new ArrayList<String>();
+		ArrayList<String> temp = new ArrayList<String>();
 
-        for(String s : list) {
-            if(!temp.contains(s)) {
-                temp.add(s);
-            } 
-        }
-        list.clear();
-        list.addAll(temp);
+		for (String s : list) {
+			if (!temp.contains(s)) {
+				temp.add(s);
+			}
+		}
+		list.clear();
+		list.addAll(temp);
 
-        return list;
-    }
+		return list;
+	}
 }
