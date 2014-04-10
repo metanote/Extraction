@@ -55,4 +55,20 @@ public class ExtractRelatedFacts {
 
 	}
 
+	public ArrayList<String> relatedFactsWithoutTemp(
+			ArrayList<String> listRelaFacts, ArrayList<String> listTempFacts) {
+		  ArrayList<String> temp = new ArrayList<String>();
+
+	        for(String s : listRelaFacts) {
+	            if(!listTempFacts.contains(s)) {
+	                temp.add(s);
+	            } 
+	        }
+	        listRelaFacts.clear();
+	        listRelaFacts.addAll(temp);
+
+		// TODO Auto-generated method stub
+		return listRelaFacts;
+	}
+
 }

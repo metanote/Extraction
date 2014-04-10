@@ -18,14 +18,15 @@ public class mainFunction {
 		ArrayList<String> listFacts = ex.readFileFacts(listTempFacts);
 		System.out.println(" liste des faits : ");
 		p.printFactList(listFacts);
-	//	ExtractRelatedFacts re = new ExtractRelatedFacts();
-	//	ArrayList<String> listRelaFacts = re.readFileRelatedFacts(listFacts,
-		//		file);
-		// System.out.println(" liste des faits reliés : ");
-		// p.printFactList(listRelaFacts);
+		ExtractRelatedFacts re = new ExtractRelatedFacts();
+		ArrayList<String> listRelaFacts = re.readFileRelatedFacts(listFacts,file);
+		ArrayList<String> relatedWithoutTemp=re.relatedFactsWithoutTemp(listRelaFacts,listTempFacts);
+		System.out.println(" liste des faits reliés : ");
+		p.printFactList(relatedWithoutTemp);
 		System.out.println("Choix multiple de l'expert (1,2,3...) ");
+		
 	//	Scanner sc = new Scanner(System.in);
-//		String choix = sc.nextLine();
+	//	String choix = sc.nextLine();
 
 	}
 }

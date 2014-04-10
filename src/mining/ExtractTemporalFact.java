@@ -1,10 +1,8 @@
 package mining;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import java.util.*;
+
 
 public class ExtractTemporalFact {
 	// lire les données à partir d'un fichier
@@ -13,7 +11,7 @@ public class ExtractTemporalFact {
 	ArrayList<String> facts = new ArrayList<String>();
 
 	HashMap<Integer, ArrayList<String>> mp = new HashMap<Integer, ArrayList<String>>();
-
+	private ArrayList<String> newListFact=new ArrayList<String>();
 	public ArrayList<String> putTemporalPoss() {
 		ArrayList<String> temporalPossibilities = new ArrayList<String>();
 
@@ -69,7 +67,7 @@ public class ExtractTemporalFact {
 
 	public ArrayList<String> readFileFacts(ArrayList<String> temporalFacts) {
 		ArrayList<String> tp = putTemporalPoss();
-		ArrayList<String> newListFact;
+		
 		for (String x : temporalFacts) {
 			for (String z : tp)
 
@@ -88,13 +86,35 @@ public class ExtractTemporalFact {
 				}
 		}
 
-//		for (Iterator<String> it=facts.iterator(); it.hasNext();) {
-//		    if (it.next().contains("make"))
-//		        it.remove();
-//		}
-		System.out.println("Size " + facts.size());
-
-		return facts;
+		
+		int j = 0;
+		String s = facts.get(j);
+		while(j<facts.size()) {
+			j++;
+			for (int i = j; i < facts.size(); i++) {
+				if (!s.equalsIgnoreCase("")&&(facts.get(i)!=s))
+					newListFact.add(s);
+				
+			}
+			if (j<facts.size())
+			s = facts.get(j);
+		}
+		
+		
+		return removeDuplicates(newListFact);
 
 	}
+	public static ArrayList<String> removeDuplicates(ArrayList<String> list) {
+        ArrayList<String> temp = new ArrayList<String>();
+
+        for(String s : list) {
+            if(!temp.contains(s)) {
+                temp.add(s);
+            } 
+        }
+        list.clear();
+        list.addAll(temp);
+
+        return list;
+    }
 }
