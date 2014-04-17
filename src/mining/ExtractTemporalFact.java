@@ -23,8 +23,8 @@ public class ExtractTemporalFact {
 
 	}
 
-	public ArrayList<String> readFileTemporalFacts(String file) {
-		ArrayList<String> tp = putTemporalPoss();
+	public ArrayList<String> readFileTemporalFacts(String file,ArrayList<String> tp) {
+		
 		try {
 			InputStream flux = new FileInputStream(file);
 			InputStreamReader lecture = new InputStreamReader(flux);
@@ -61,13 +61,13 @@ public class ExtractTemporalFact {
 		} catch (Exception ex) {
 			System.out.println(ex.getMessage());
 		}
-
+			
 		return temporalFacts;
 
 	}
 
-	public ArrayList<String> readFileFacts(ArrayList<String> temporalFacts) {
-		ArrayList<String> tp = putTemporalPoss();
+	public ArrayList<String> readFileFacts(ArrayList<String> temporalFacts, ArrayList<String> tp) {
+		// = putTemporalPoss();
 
 		for (String x : temporalFacts) {
 			for (String z : tp)

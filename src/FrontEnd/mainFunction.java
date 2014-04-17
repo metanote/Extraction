@@ -1,19 +1,16 @@
 package FrontEnd;
 
-//import java.io.File;
-//import java.io.FileInputStream;
 import java.io.IOException;
-//import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Scanner;
+
 import org.apache.log4j.Appender;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
+
 import com.hp.hpl.jena.query.*;
-//import com.hp.hpl.jena.rdf.model.Model;
-//import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 import mining.*;
 
@@ -22,25 +19,44 @@ public class mainFunction {
 	private static Scanner sc;
 
 	public static void main(String args[]) throws IOException {
-		String file = "file/Volcano.csv";
-		sc = new Scanner(System.in);
 		ExtractTemporalFact ex = new ExtractTemporalFact();
-		ArrayList<String> listTempFacts = ex.readFileTemporalFacts(file);
+
+		String file = "file/Volcano.csv";
+		ArrayList<String> temporalPossibilities = new ArrayList<String>();
+		sc = new Scanner(System.in);
+		System.out
+				.println("Input temporal indication number or 0 for default list ");
+		int n = sc.nextInt();
+		if (n == 0)
+			temporalPossibilities = ex.putTemporalPoss();
+		else
+			for (int i = 0; i < n + 1; i++) {
+				String s = sc.nextLine();
+				if (!s.equalsIgnoreCase(""))
+					temporalPossibilities.add(s);
+				System.out.println("Add new temporelle indicateur");
+
+			}
+
+		ArrayList<String> listTempFacts = ex.readFileTemporalFacts(file,
+				temporalPossibilities);
 		System.out.println("**** liste des faits temporels : ****");
 		PrintFacts p = new PrintFacts();
 		p.printFactList(listTempFacts);
-		
-		System.out.println("**** Choix d'un fait temporelle dans la liste : ****");
+
+		System.out
+				.println("**** Choix d'un fait temporelle dans la liste : ****");
 		int choix = sc.nextInt();
-		
-		ArrayList<String> listFacts = ex.readFileFacts(listTempFacts);
+
+		ArrayList<String> listFacts = ex.readFileFacts(listTempFacts,
+				temporalPossibilities);
 		System.out.println("**** liste des faits : ****");
 		p.printFactList(listFacts);
 		ExtractRelatedFacts re = new ExtractRelatedFacts();
 		ArrayList<String> listRelaFacts = re.readFileRelatedFacts(listFacts,
 				file);
 		ArrayList<String> relatedWithoutTemp = re.relatedFactsWithoutTemp(
-				listRelaFacts, listTempFacts);
+				listRelaFacts, listTempFacts, temporalPossibilities);
 		System.out.println("**** liste des faits reliés : ****");
 		p.printFactList(relatedWithoutTemp);
 		System.out.println("****Choix d'un fait relié****");
@@ -49,7 +65,7 @@ public class mainFunction {
 				.println("**** Choix de l'expert : Le premier choix est un fait temporel --"
 						+ listTempFacts.get(choix - 1)
 						+ "-- Le deuxième choix est un fait relié --"
-						+ relatedWithoutTemp.get(choix2 - 1)+"-- ****");
+						+ relatedWithoutTemp.get(choix2 - 1) + "-- ****");
 
 		// Open the bloggers RDF graph from the filesystem
 		Logger rootLogger = Logger.getRootLogger();
@@ -65,16 +81,45 @@ public class mainFunction {
 		// in.close();
 		try {
 			// Create a new query
-			String queryString = "SELECT ?x ?y ?z{  ?x dbpedia-owl:"
-					+ listTempFacts.get(choix - 1) + " ?y." + "?x dbpedia-owl:"
-					+ relatedWithoutTemp.get(choix2 - 1) + " ?z."
-					+ "} LIMIT 100";
+			// String queryString =
+			// "PREFIX dbo:<http://dbpedia.org/resources/Volcano> "
+			// + "SELECT ?x ?y ?z{  ?x dbo:"
+			// + listTempFacts.get(choix - 1) + " ?y." + "?x dbo:"
+			// + relatedWithoutTemp.get(choix2 - 1) + " ?z."
+			// + "} LIMIT 100	";
 
+			String queryString = " PREFIX foaf:  <http://xmlns.com/foaf/0.1/>"
+					+ "SELECT ?name" + " WHERE {" + "?person foaf:name ?name ."
+					+ "}";
+
+			// String queryString =
+			// "PREFIX ot:<http://www.opentox.org/api/1.1#>"
+			// + "PREFIX ota:<http://www.opentox.org/algorithmTypes.owl#>"
+			// + "PREFIX owl:<http://www.w3.org/2002/07/owl#>"
+			// + "PREFIX dc:<http://purl.org/dc/elements/1.1/>"
+			// + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>"
+			// + "PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
+			// + "PREFIX bibrdf:<http://zeitkunst.org/bibtex/0.1/bibtex.owl#>"
+			// +
+			// "PREFIX bo:<http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#>"
+			// +
+			// "select ?descriptor ?label ?cites ?doi ?definition ?requires ?category ?contributor"
+			// + "	where {"
+			// +
+			// "{{?descriptor rdf:type bo:Algorithm} UNION {?descriptor rdf:type bo:MolecularDescriptor}}."
+			// + "	OPTIONAL {?descriptor rdfs:label ?label}."
+			// + "          OPTIONAL {?descriptor bo:definition ?definition}."
+			// + "        OPTIONAL {?descriptor dc:contributor ?contributor}."
+			// + "      OPTIONAL {?descriptor bo:isClassifiedAs ?category}."
+			// + "    OPTIONAL {?descriptor bo:requires?requires}."
+			// + "  OPTIONAL {?descriptor bo:cites ?cites."
+			// + "  ?cites bibrdf:hasTitle ?title."
+			// + " OPTIONAL {?cites bo:DOI ?doi.}}.}";
 			Query query = QueryFactory.create(queryString);
 
 			// Execute the query and obtain results
 			QueryExecution qexec = QueryExecutionFactory.sparqlService(
-					"http://dbpedia.org/sparql", query);
+					"http://ambit.uni-plovdiv.bg:8080/ontology", query);//http://dbpedia.org ??
 
 			ResultSet results = qexec.execSelect();
 

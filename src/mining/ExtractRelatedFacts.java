@@ -56,13 +56,25 @@ public class ExtractRelatedFacts {
 	}
 
 	public ArrayList<String> relatedFactsWithoutTemp(
-			ArrayList<String> listRelaFacts, ArrayList<String> listTempFacts) {
+			ArrayList<String> listRelaFacts, ArrayList<String> listTempFacts,
+			ArrayList<String> tp) {
 		ArrayList<String> temp = new ArrayList<String>();
 
 		for (String s : listRelaFacts) {
 			if (!listTempFacts.contains(s)) {
 				temp.add(s.replace("\"", ""));
 			}
+		}
+		listRelaFacts.clear();
+		listRelaFacts.addAll(temp);
+		temp.clear();
+		for (String ch : listRelaFacts) {
+			Boolean bon = false;
+			for (String p : tp)
+				if (ch.toLowerCase().matches("(.*)" + p.toLowerCase() + "(.*)"))
+					bon = true;
+			if (bon == false)
+				temp.add(ch);
 		}
 		listRelaFacts.clear();
 		listRelaFacts.addAll(temp);
