@@ -17,8 +17,13 @@ public class ExtractTemporalFact {
 
 		temporalPossibilities.add("year");
 		temporalPossibilities.add("day");
+		temporalPossibilities.add("years");
+		temporalPossibilities.add("days");
 		temporalPossibilities.add("month");
 		temporalPossibilities.add("time");
+		temporalPossibilities.add("months");
+		temporalPossibilities.add("times");
+
 		return temporalPossibilities;
 
 	}

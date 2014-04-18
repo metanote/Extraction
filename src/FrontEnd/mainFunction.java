@@ -20,8 +20,10 @@ public class mainFunction {
 
 	public static void main(String args[]) throws IOException {
 		ExtractTemporalFact ex = new ExtractTemporalFact();
-
-		String file = "file/Volcano.csv";
+		ArrayList<String> listTempFacts = new ArrayList<String>();
+		ArrayList<String> listFacts = new ArrayList<String>();
+		ArrayList<String> listAtt = new ArrayList<String>();
+		String file = "file/President" + ".csv";
 		ArrayList<String> temporalPossibilities = new ArrayList<String>();
 		sc = new Scanner(System.in);
 		System.out
@@ -34,36 +36,61 @@ public class mainFunction {
 				String s = sc.nextLine();
 				if (!s.equalsIgnoreCase(""))
 					temporalPossibilities.add(s);
-				System.out.println("Add new temporelle indicateur");
+				System.out.println("Add new temporal token");
 
 			}
 
-		ArrayList<String> listTempFacts = ex.readFileTemporalFacts(file,
+		ArrayList<String> temp = ex.readFileTemporalFacts(file,
 				temporalPossibilities);
-		System.out.println("**** liste des faits temporels : ****");
+		System.out.println("**** liste des token temporels : ****");
 		PrintFacts p = new PrintFacts();
+		listTempFacts = p.duplicationDetector(temp);
+
 		p.printFactList(listTempFacts);
 
-		System.out
-				.println("**** Choix d'un fait temporelle dans la liste : ****");
-		int choix = sc.nextInt();
+		// la liste des attributs
+		System.out.println("**** liste des Attributs : ****");
+		listFacts = p.selectAllAtribut(listTempFacts, temporalPossibilities);
+		p.printFactList(p.duplicationDetector(listFacts));
 
-		ArrayList<String> listFacts = ex.readFileFacts(listTempFacts,
-				temporalPossibilities);
-		System.out.println("**** liste des faits : ****");
-		p.printFactList(listFacts);
+		// choix d'un fait temporel
+
+		System.out
+				.println("**** Choix liste des attributs intéressants : ****");
+		System.out.println("Nombre de choix inf " + listFacts.size());
+		int nbChoix = sc.nextInt();
+		int choix;
+		for (int i = 0; i < nbChoix; i++) {
+			System.out.println("ajouter le " + i + "eme element");
+			choix = sc.nextInt();
+			String fact = listFacts.get(choix - 1);
+			listAtt.add(fact);
+		}
+		System.out.println("***La liste des attributs***");
+		p.printFactList(p.duplicationDetector(listAtt));
+
+		// related facts
 		ExtractRelatedFacts re = new ExtractRelatedFacts();
-		ArrayList<String> listRelaFacts = re.readFileRelatedFacts(listFacts,
-				file);
+
+		ArrayList<String> listRelaFacts = re
+				.readFileRelatedFacts(listAtt, file);
+
 		ArrayList<String> relatedWithoutTemp = re.relatedFactsWithoutTemp(
 				listRelaFacts, listTempFacts, temporalPossibilities);
-		System.out.println("**** liste des faits reliés : ****");
-		p.printFactList(relatedWithoutTemp);
-		System.out.println("****Choix d'un fait relié****");
+		System.out.println("***La liste des attributs reliés***");
+		
+		p.printFactList(p.duplicationDetector(relatedWithoutTemp));
+
+		System.out.println("****Choix de l'expert un fait temporel entre 1 et "
+				+ listTempFacts.size() + "****");
+		int choix1 = sc.nextInt();
+		System.out.println("****Choix de l'expert un fait reliée entre 1 et "
+				+ relatedWithoutTemp.size() + "****");
 		int choix2 = sc.nextInt();
+
 		System.out
 				.println("**** Choix de l'expert : Le premier choix est un fait temporel --"
-						+ listTempFacts.get(choix - 1)
+						+ listTempFacts.get(choix1 - 1)
 						+ "-- Le deuxième choix est un fait relié --"
 						+ relatedWithoutTemp.get(choix2 - 1) + "-- ****");
 
@@ -75,22 +102,27 @@ public class mainFunction {
 
 		// InputStream in = new FileInputStream(new File("file/bloggers.rdf"));
 		//
-		// // Create an empty in-memory model and populate it from the graph
+		// Create an empty in-memory model and populate it from the graph
 		// Model model = ModelFactory.createMemModelMaker().createModel(null);
 		// model.read(in, null); // null base URI, since model URIs are absolute
 		// in.close();
-		try {
-			// Create a new query
-			// String queryString =
-			// "PREFIX dbo:<http://dbpedia.org/resources/Volcano> "
-			// + "SELECT ?x ?y ?z{  ?x dbo:"
-			// + listTempFacts.get(choix - 1) + " ?y." + "?x dbo:"
-			// + relatedWithoutTemp.get(choix2 - 1) + " ?z."
-			// + "} LIMIT 100	";
 
-			String queryString = " PREFIX foaf:  <http://xmlns.com/foaf/0.1/>"
-					+ "SELECT ?name" + " WHERE {" + "?person foaf:name ?name ."
-					+ "}";
+		try {
+
+			// Create a new query
+			String queryString = "PREFIX dbo:<http://dbpedia.org/resources/Volcano> "
+					+ "SELECT ?x ?y ?z{  ?x dbo:"
+					+ listTempFacts.get(choix1 - 1)
+					+ " ?y."
+					+ "?x dbo:"
+					+ relatedWithoutTemp.get(choix2 - 1)
+					+ " ?z."
+					+ "} LIMIT 100	";
+
+			// String queryString =
+			// " PREFIX foaf:  <http://xmlns.com/foaf/0.1/>"
+			// + "SELECT ?x ?p" + " WHERE {" + "?x dbpedia-owl:abstract ?p  ."
+			// + "}";
 
 			// String queryString =
 			// "PREFIX ot:<http://www.opentox.org/api/1.1#>"
@@ -115,12 +147,16 @@ public class mainFunction {
 			// + "  OPTIONAL {?descriptor bo:cites ?cites."
 			// + "  ?cites bibrdf:hasTitle ?title."
 			// + " OPTIONAL {?cites bo:DOI ?doi.}}.}";
+
 			Query query = QueryFactory.create(queryString);
 
-			// Execute the query and obtain results
+			// // Execute the query and obtain results
 			QueryExecution qexec = QueryExecutionFactory.sparqlService(
-					"http://ambit.uni-plovdiv.bg:8080/ontology", query);//http://dbpedia.org ??
-
+					"http://ambit.uni-plovdiv.bg:8080/ontology", query);//
+			// http://dbpedia.org
+			// http://mappings.dbpedia.org/server/ontology/classes/Volcano
+			// // ??
+			//
 			ResultSet results = qexec.execSelect();
 
 			// Output query results
@@ -129,7 +165,7 @@ public class mainFunction {
 			// Important - free up resources used running the query
 			qexec.close();
 		} catch (Exception e) {
-			System.out.println("Une Exception " + e.getMessage());
+			System.out.println("Une Exception " + e.getMessage().toString());
 		}
 	}
 }
