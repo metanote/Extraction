@@ -23,6 +23,11 @@ public class ExtractTemporalFact {
 		temporalPossibilities.add("time");
 		temporalPossibilities.add("months");
 		temporalPossibilities.add("times");
+		temporalPossibilities.add("since");
+		temporalPossibilities.add("until");
+		temporalPossibilities.add("born");
+		temporalPossibilities.add("starts");
+		temporalPossibilities.add("ends");
 
 		return temporalPossibilities;
 

@@ -14,7 +14,12 @@ import com.hp.hpl.jena.query.*;
 
 import mining.*;
 
-public class mainFunction {
+public class MainFunction {
+	ExtractTemporalFact ex = new ExtractTemporalFact();
+	ExtractRelatedFacts re = new ExtractRelatedFacts();
+	PrintFacts p = new PrintFacts();
+	String file = "file/President" + ".csv";
+	ArrayList<String> temporalPossibilities = new ArrayList<String>();
 
 	private static Scanner sc;
 
@@ -23,7 +28,7 @@ public class mainFunction {
 		ArrayList<String> listTempFacts = new ArrayList<String>();
 		ArrayList<String> listFacts = new ArrayList<String>();
 		ArrayList<String> listAtt = new ArrayList<String>();
-		String file = "file/President" + ".csv";
+		String file = "file/Volcano" + ".csv";
 		ArrayList<String> temporalPossibilities = new ArrayList<String>();
 		sc = new Scanner(System.in);
 		System.out
@@ -42,7 +47,7 @@ public class mainFunction {
 
 		ArrayList<String> temp = ex.readFileTemporalFacts(file,
 				temporalPossibilities);
-		System.out.println("**** liste des token temporels : ****");
+		System.out.println("**** liste des tokens temporels : ****");
 		PrintFacts p = new PrintFacts();
 		listTempFacts = p.duplicationDetector(temp);
 
@@ -56,12 +61,12 @@ public class mainFunction {
 		// choix d'un fait temporel
 
 		System.out
-				.println("**** Choix liste des attributs intéressants : ****");
-		System.out.println("Nombre de choix inf " + listFacts.size());
+				.println("**** Choisir une liste intéressante d'attributs  : ****");
+		System.out.println("Nombre de choix < " + listFacts.size());
 		int nbChoix = sc.nextInt();
 		int choix;
 		for (int i = 0; i < nbChoix; i++) {
-			System.out.println("ajouter le " + i + "eme element");
+			System.out.println("Ajouter le " + i + "eme élèment");
 			choix = sc.nextInt();
 			String fact = listFacts.get(choix - 1);
 			listAtt.add(fact);
@@ -78,7 +83,7 @@ public class mainFunction {
 		ArrayList<String> relatedWithoutTemp = re.relatedFactsWithoutTemp(
 				listRelaFacts, listTempFacts, temporalPossibilities);
 		System.out.println("***La liste des attributs reliés***");
-		
+
 		p.printFactList(p.duplicationDetector(relatedWithoutTemp));
 
 		System.out.println("****Choix de l'expert un fait temporel entre 1 et "
@@ -93,6 +98,7 @@ public class mainFunction {
 						+ listTempFacts.get(choix1 - 1)
 						+ "-- Le deuxième choix est un fait relié --"
 						+ relatedWithoutTemp.get(choix2 - 1) + "-- ****");
+		System.out.println("Résultat du requête SPARQL ");
 
 		// Open the bloggers RDF graph from the filesystem
 		Logger rootLogger = Logger.getRootLogger();
@@ -161,11 +167,50 @@ public class mainFunction {
 
 			// Output query results
 			ResultSetFormatter.out(System.out, results, query);
-
+			
+			System.out.println("Valider les resultats ");
+			System.out.println("Constract file");
 			// Important - free up resources used running the query
 			qexec.close();
 		} catch (Exception e) {
 			System.out.println("Une Exception " + e.getMessage().toString());
 		}
 	}
+
+	public ArrayList<String> geTemporalFact() {
+		temporalPossibilities.add("year");
+		temporalPossibilities.add("day");
+		temporalPossibilities.add("years");
+		temporalPossibilities.add("time");
+		temporalPossibilities.add("date");
+		temporalPossibilities.add("since");
+		temporalPossibilities.add("until");
+		temporalPossibilities.add("born");
+		temporalPossibilities.add("starts");
+		temporalPossibilities.add("ends");
+		ArrayList<String> temp = ex.readFileTemporalFacts(file,
+				temporalPossibilities);
+		
+		return p.duplicationDetector(temp);
+
+	}
+	
+	public ArrayList<String> getAttribut(){
+		return 	 p.selectAllAtribut(geTemporalFact() , temporalPossibilities);
+		
+	}
+	
+//	public ArrayList<String> geRelatedFact() {
+//		
+//		
+//		ArrayList<String> listRelaFacts = re
+//				.readFileRelatedFacts(listAtt, file);
+//
+//		ArrayList<String> relatedWithoutTemp = re.relatedFactsWithoutTemp(
+//				listRelaFacts, geTemporalFact(), temporalPossibilities);
+//		System.out.println("***La liste des attributs reliés***");
+//
+//		return p.duplicationDetector(relatedWithoutTemp);
+//		
+//	}
 }
