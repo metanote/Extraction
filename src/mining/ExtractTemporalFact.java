@@ -1,5 +1,5 @@
 package mining;
-
+import FrontEnd.*;
 import java.io.*;
 import java.util.*;
 
@@ -126,5 +126,10 @@ public class ExtractTemporalFact {
 		list.addAll(temp);
 
 		return list;
+	}
+	
+	public  ArrayList<StringPair> CoupleList(String file3) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
