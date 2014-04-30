@@ -3,7 +3,7 @@ package FrontEnd;
 public class StringPair {
 	String leftString;
 	String rightString;
-
+	public StringPair(){}
 	public StringPair(String leftString, String rightString) {
 		this.leftString = leftString;
 		this.rightString = rightString;

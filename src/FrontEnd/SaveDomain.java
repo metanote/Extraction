@@ -38,11 +38,18 @@ public class SaveDomain {
 				if (qs.getResource("prop") != null) {
 					String uri = qs.getResource("prop").getURI();
 					if (uri.contains("http://dbpedia.org/ontology/"))
-						System.out.println(qs.getResource("prop").toString().substring(28, uri.length()));
-					writer.write(uri.substring(28, uri.length()) + "\n");
-				}
+					{
+					String newuri=uri.substring(28, uri.length()) ;
+					if(newuri.length()>2)
+					if (newuri.contains("/")){
+						String str = newuri.substring(newuri.indexOf("/") + 1, newuri.length());
+						writer.write(str+"\n");
+					} else
+						writer.write(newuri+"\n");
+					}
+					}}
 				
-			}
+			
 			writer.close();
 			System.out.println("All properties have been written in file");
 		} catch (Exception e) {

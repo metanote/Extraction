@@ -1,5 +1,7 @@
 package mining;
+
 import FrontEnd.*;
+
 import java.io.*;
 import java.util.*;
 
@@ -16,25 +18,15 @@ public class ExtractTemporalFact {
 		ArrayList<String> temporalPossibilities = new ArrayList<String>();
 
 		temporalPossibilities.add("year");
-		temporalPossibilities.add("day");
-		temporalPossibilities.add("years");
-		temporalPossibilities.add("days");
-		temporalPossibilities.add("month");
-		temporalPossibilities.add("time");
-		temporalPossibilities.add("months");
-		temporalPossibilities.add("times");
-		temporalPossibilities.add("since");
-		temporalPossibilities.add("until");
-		temporalPossibilities.add("born");
-		temporalPossibilities.add("starts");
-		temporalPossibilities.add("ends");
+		temporalPossibilities.add("date");
 
 		return temporalPossibilities;
 
 	}
 
-	public ArrayList<String> readFileTemporalFacts(String file,ArrayList<String> tp) {
-		
+	public ArrayList<String> readFileTemporalFacts(String file,
+			ArrayList<String> tp) {
+
 		try {
 			InputStream flux = new FileInputStream(file);
 			InputStreamReader lecture = new InputStreamReader(flux);
@@ -50,7 +42,7 @@ public class ExtractTemporalFact {
 						if (x.length() < 25)
 							if (x.toLowerCase().contains(z)) {
 								String ch = x.replace(z, "");
-								String ch2= ch.replace("\"", "");
+								String ch2 = ch.replace("\"", "");
 								facts.add(ch2);
 								boolean bon = true;
 								for (String e : temporalFacts)
@@ -71,12 +63,13 @@ public class ExtractTemporalFact {
 		} catch (Exception ex) {
 			System.out.println(ex.getMessage());
 		}
-			
+
 		return temporalFacts;
 
 	}
 
-	public ArrayList<String> readFileFacts(ArrayList<String> temporalFacts, ArrayList<String> tp) {
+	public ArrayList<String> readFileFacts(ArrayList<String> temporalFacts,
+			ArrayList<String> tp) {
 		// = putTemporalPoss();
 
 		for (String x : temporalFacts) {
@@ -114,7 +107,7 @@ public class ExtractTemporalFact {
 
 	}
 
-	public static ArrayList<String> removeDuplicates(ArrayList<String> list) {
+	public ArrayList<String> removeDuplicates(ArrayList<String> list) {
 		ArrayList<String> temp = new ArrayList<String>();
 
 		for (String s : list) {
@@ -127,9 +120,146 @@ public class ExtractTemporalFact {
 
 		return list;
 	}
-	
-	public  ArrayList<StringPair> CoupleList(String file3) {
-		// TODO Auto-generated method stub
-		return null;
+
+	public ArrayList<StringPair> removeDuplicatesPairs(
+			ArrayList<StringPair> list) {
+		ArrayList<StringPair> temp = new ArrayList<StringPair>();
+		int i=0;
+		while (i<list.size()-2){
+			while((list.get(i).getRightString().equalsIgnoreCase(list.get(i+1).getRightString()))&&(i<list.size()-1))
+					i++;
+		temp.add(list.get(i))	;
+		i++;
+		}
+		
+		return temp;
 	}
+
+	public ArrayList<String> tFactsList(String file,
+			ArrayList<String> temporalFacts) {
+		ArrayList<String> facts = new ArrayList<String>();
+		ArrayList<String> filtredFacts = new ArrayList<String>();
+		try {
+			InputStream flux = new FileInputStream(file);
+			InputStreamReader lecture = new InputStreamReader(flux);
+			@SuppressWarnings("resource")
+			BufferedReader buff = new BufferedReader(lecture);
+			String line;
+
+			while ((line = buff.readLine()) != null) {
+				for (String tf : temporalFacts)
+					if (line.toLowerCase().endsWith(tf))
+						facts.add(line);
+			}
+		} catch (Exception Ex) {
+			System.out.println("Exception is detected " + Ex.getMessage());
+		}
+		filtredFacts = filterFacts(facts);
+		return filtredFacts;
+	}
+
+	private ArrayList<String> filterFacts(ArrayList<String> facts2) {
+		ArrayList<String> flist = new ArrayList<String>();
+		for (String f : facts2)
+			if (f.contains("/")) {
+				String str = f.substring(f.indexOf("/") + 1, f.length());
+				flist.add(str);
+			} else
+				flist.add(f);
+		return flist;
+	}
+
+	public ArrayList<String> findMotifs(ArrayList<String> cp,
+			ArrayList<String> tp) {
+
+		ArrayList<String> motifList = new ArrayList<String>();
+		try {
+
+			for (String s : cp)
+				for (String t : tp) {
+					String motif = "";
+					if (s.toLowerCase().endsWith(t)) {
+						// System.out.println(s);
+						int index = s.toLowerCase().indexOf(t);
+						if (index > 0) {
+
+							motif = s.substring(0, index);
+							// System.out.println("Motif "+motif);
+							motifList.add(motif);
+							// buff.close();
+
+						}
+					}
+				}
+		} catch (Exception Ex) {
+			System.out.println("Exception is detected " + Ex.getMessage());
+		}
+
+		return motifList;
+	}
+
+	public ArrayList<ArrayList<StringPair>> findPairs(ArrayList<String> motifs,
+			String file) {
+		ArrayList<StringPair> pList = new ArrayList<StringPair>();
+		ArrayList<ArrayList<StringPair>> pList2 = new ArrayList<ArrayList<StringPair>>();
+		for (String motif : motifs) {
+			pList = parseFile(motif, file);
+			if (pList.size() >= 2)
+				pList2.add(pList);
+		}
+		return pList2;
+	}
+
+	private ArrayList<StringPair> parseFile(String motif, String file) {
+		InputStream flux = null;
+		ArrayList<StringPair> pList = new ArrayList<StringPair>();
+		try {
+			flux = new FileInputStream(file);
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		}
+		InputStreamReader lecture = new InputStreamReader(flux);
+		@SuppressWarnings("resource")
+		BufferedReader buff = new BufferedReader(lecture);
+		String line;
+		StringPair p = null;
+		try {
+			while ((line = buff.readLine()) != null) {
+				if (line.toLowerCase().contains(motif.toLowerCase())) {
+					p = new StringPair(motif, line);
+					pList.add(p);
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return pList;
+	}
+
+	public ArrayList<StringPair> findListPairs(
+			ArrayList<ArrayList<StringPair>> lp, ArrayList<String> tp) {
+		ArrayList<StringPair> fl = new ArrayList<StringPair>();
+
+		for (ArrayList<StringPair> pp : lp)
+			for (StringPair sp : pp) {
+				for (String t : tp) {
+
+					if (!sp.getRightString()
+							.toLowerCase()
+							.equalsIgnoreCase(
+									sp.getLeftString().toLowerCase() + t))
+
+					{
+						StringPair s = new StringPair(sp.getLeftString()
+								.toLowerCase() + t, sp.getRightString());
+						fl.add(s);
+					}
+
+				}
+			}
+
+		return fl;
+	}
+
 }
