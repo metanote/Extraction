@@ -5,6 +5,13 @@ import FrontEnd.*;
 import java.io.*;
 import java.util.*;
 
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.ResultSet;
+
 public class ExtractTemporalFact {
 	// lire les données à partir d'un fichier
 	// lire ligne par ligne et extraire des attribut temporels
@@ -124,14 +131,16 @@ public class ExtractTemporalFact {
 	public ArrayList<StringPair> removeDuplicatesPairs(
 			ArrayList<StringPair> list) {
 		ArrayList<StringPair> temp = new ArrayList<StringPair>();
-		int i=0;
-		while (i<list.size()-2){
-			while((list.get(i).getRightString().equalsIgnoreCase(list.get(i+1).getRightString()))&&(i<list.size()-1))
-					i++;
-		temp.add(list.get(i))	;
-		i++;
+		int i = 0;
+		while (i < list.size() - 2) {
+			while ((list.get(i).getRightString().equalsIgnoreCase(list.get(
+					i + 1).getRightString()))
+					&& (i < list.size() - 1))
+				i++;
+			temp.add(list.get(i));
+			i++;
 		}
-		
+
 		return temp;
 	}
 
@@ -260,6 +269,64 @@ public class ExtractTemporalFact {
 			}
 
 		return fl;
+	}
+
+	public String returnPair(int lineNumber, String string) {
+		String result = "";
+		try {
+
+			@SuppressWarnings("resource")
+			BufferedReader r2 = new BufferedReader(new FileReader(new File(
+					string)));
+
+			int i = 0;
+			while (r2.readLine() != null) {
+				i++;
+				if (i == lineNumber) {
+					result = r2.readLine();
+					System.out.println(i + " Resultat " + result);
+				}
+
+			}
+
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+
+		return result;
+	}
+
+	public void saveQuads(String fileName, String sQuery, String tempProp,
+			String relatedProp) {
+
+		Writer writer = null;
+		try {
+
+			Query query = QueryFactory.create(sQuery);
+			QueryExecution qexec = QueryExecutionFactory.sparqlService(
+					"http://dbpedia.org/sparql", query);
+
+			ResultSet results = qexec.execSelect();
+			writer = new BufferedWriter(new OutputStreamWriter(
+					new FileOutputStream("file/" + fileName), "utf-8"));
+			while (results.hasNext()) {
+				QuerySolution qs = results.nextSolution();
+				if (qs.getResource("x") != null) {
+
+					writer.write(qs.getResource("x").toString() + " -- "
+							+ relatedProp + " -- "
+							+ qs.getResource("y").toString() + " : "
+							+ qs.getLiteral("z").toString().substring(0, 10)
+							+ "\n");
+
+				}
+			}
+
+			writer.close();
+		} catch (Exception ex) {
+			System.out.println("Here Exception " + ex.getMessage());
+		}
+
 	}
 
 }

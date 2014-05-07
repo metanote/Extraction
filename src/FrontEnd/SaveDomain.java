@@ -14,14 +14,15 @@ import com.hp.hpl.jena.query.ResultSet;
 
 public class SaveDomain {
 
-	public String fileProperties()
+	public String fileProperties(String fileName)
 
 	{ // save all properties from dbpedia
 		Writer writer = null;
 		try {
 			
+	
 			writer = new BufferedWriter(new OutputStreamWriter(
-					new FileOutputStream("file/properties.txt"), "utf-8"));
+					new FileOutputStream("file/"+fileName), "utf-8"));
 			String sQuery = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> SELECT DISTINCT ?prop WHERE { ?prop rdfs:domain ?y }";
 
 			Query query = QueryFactory.create(sQuery);
@@ -55,6 +56,6 @@ public class SaveDomain {
 		} catch (Exception e) {
 			System.out.print("You have an exception  " + e.getMessage());
 		}
-		return "file/properties.txt";
+		return "file/"+fileName;
 	}
 }

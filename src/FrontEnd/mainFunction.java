@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import com.hp.hpl.jena.query.*;
 
 import mining.*;
 
@@ -19,11 +20,8 @@ public class MainFunction {
 
 	public static void main(String args[]) throws IOException {
 		ExtractTemporalFact ex = new ExtractTemporalFact();
-		// ArrayList<String> listTempFacts = new ArrayList<String>();
-		// ArrayList<String> listFacts = new ArrayList<String>();
-		// ArrayList<String> listAtt = new ArrayList<String>();
-		// String file = "file/Volcano" + ".csv";
 		ArrayList<String> temporalPossibilities = new ArrayList<String>();
+		
 		try {
 			sc = new Scanner(System.in);
 			System.out
@@ -60,45 +58,43 @@ public class MainFunction {
 		// ***new Proposition***
 
 		// read properties from file and make list of couple.
+		
+		System.out.println("Do you want to check properties ? yes/no");
+		@SuppressWarnings("resource")
+		Scanner scc=new Scanner(System.in);
+		String rep=scc.nextLine().toLowerCase();
+		
+		String file2;
+		if (rep.equalsIgnoreCase("yes"))
+		{
 		SaveDomain sd = new SaveDomain();
-		String file2 = sd.fileProperties();
+		String fileName="properties.txt";
+		file2 = sd.fileProperties(fileName);
+		}else
+		file2="file/properties.txt";
+		
+		
 		ArrayList<String> cp = ex.tFactsList(file2, temporalPossibilities);
-		// for(String ft: cp)
-		// System.out.println("Fait Temporel "+ft);
-		//
-		// System.out.println("List Length"+cp.size());
-
+		
 		ArrayList<ArrayList<StringPair>> listPairs = new ArrayList<ArrayList<StringPair>>();
 		ArrayList<String> listMotifs = new ArrayList<String>();
 		listMotifs = ex.findMotifs(cp, temporalPossibilities);
-		// System.out.println("Motif without duplication");
+			
 		ArrayList<String> listMWD = new ArrayList<String>();
+		
 		// filter duplicate
-		listMWD = ex.removeDuplicates(listMotifs);
-		// for(String p: listMWD){
-		// System.out.println("Motif "+p);
-		// }
-		//
-		listPairs = ex.findPairs(listMWD, "file/prop.txt");
-		// System.out.println("LP " + listPairs.size());
-		// for (ArrayList<StringPair> p : listPairs)
-		// for (StringPair s : p) {
-		// System.out.println("le pair " + s.leftString + " "
-		// + s.rightString);
-		// }
-
+		
+		listMWD = ex.removeDuplicates(listMotifs);	
+		listPairs = ex.findPairs(listMWD, file2);
+		
 		// Liste des vrais couples
 
 		ArrayList<StringPair> listTPFR = new ArrayList<StringPair>();
 
 		listTPFR = ex.findListPairs(listPairs, temporalPossibilities);
-		// System.out.println("*********New Pairs*************");
-		// for(StringPair p : listTPFR)
-		// System.out.println("new pairs " +p.leftString + " " + p.rightString);
-		//
-		// final list with scan
 
 		// filter
+
 		ArrayList<StringPair> finalpairlist = new ArrayList<StringPair>();
 		for (StringPair sp : listTPFR)
 			for (ArrayList<StringPair> p : listPairs)
@@ -111,6 +107,7 @@ public class MainFunction {
 				}
 
 		// last filter
+		
 		ArrayList<StringPair> finallist = new ArrayList<StringPair>();
 
 		for (StringPair p : finalpairlist)
@@ -126,44 +123,77 @@ public class MainFunction {
 		ArrayList<StringPair> temp = new ArrayList<StringPair>();
 		temp = ex.removeDuplicatesPairs(finallist);
 
-		System.out.println("Size temp " + temp.size() + " first pair "
-				+ temp.get(0).getLeftString() + ","
-				+ temp.get(0).getRightString());
-
 		Writer w2 = null;
 		try {
 
 			w2 = new BufferedWriter(new OutputStreamWriter(
-					new FileOutputStream("file/rst.txt"), "utf-8"));
-
-			 for (StringPair p : temp)
-			 w2.write( p.getLeftString() + "," + p.getRightString()
-			 + "\n");
-			w2.close();
+					new FileOutputStream("file/rst2.txt"), "utf-8"));
+			int u=0;
+			for (StringPair p : temp)
+			{
+				u++;
+				w2.write(u+" "+p.getLeftString() + "," + p.getRightString() + "\n");
+			}
+				w2.close();
 		} catch (Exception e) {
 			System.out.println("Exception " + e.getMessage());
 		}
 		// print in file
-		System.out.println("Now Expert choice");
+		System.out.println("Now Expert choice ");
 
-		// System.out.println("*********Final Pairs List*************");
-		// for (StringPair p : finallist)
-		// System.out
-		// .println("Le pairs " + p.leftString + " " + p.rightString);
-		// System.out.println(finalpairlist.size() + " final list "
-		// + finallist.size());
+		// return line pair
+		@SuppressWarnings("resource")
+		Scanner sca = new Scanner(System.in);
+		int lineNumber = sca.nextInt();
+	
+		String pair = ex.returnPair(lineNumber, "file/rst.txt");
 
-		// ***newProposition***
+	//	System.out.println("your couple is " + pair);
 
+		String tempProp = pair.substring(0, pair.indexOf(","));
+
+		String relatedProp = pair.substring(pair.indexOf(",") + 1,
+				pair.length());
+
+		System.out.println("Tremporal Property " + tempProp
+				+ " Related Property " + relatedProp);
+
+		System.out.println("SPARQL Query");
+
+		
+		String myQuery=" PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> PREFIX dbp:<http://dbpedia.org/ontology/> select (CONCAT(?label1, ' "+ relatedProp+" ', ?label2, ' : ', ?date) AS ?result)"
+				+ "where {?subject dbp:"+relatedProp +" ?place;"
+				+ "dbp:"+ tempProp +" ?date;"
+				+ "rdfs:label ?label1 ."
+				+ "?place rdfs:label ?label2 ."
+				+ "FILTER(lang(?label1)='en' && lang(?label2)='en')}"
+						+ "LIMIT 100 OFFSET 200";
+
+		
+		Query query = QueryFactory.create(myQuery);
+		  
+		 // Execute the query and obtain results QueryExecution 
+		QueryExecution qexec =QueryExecutionFactory.sparqlService( "http://dbpedia.org/sparql",query);
+		ResultSet results = qexec.execSelect(); 
+		  // Output query results 
+		ResultSetFormatter.out(System.out, results, query);
+		
+		//save result dans un file 
+		
+		System.out.println("choose file name ");
+		@SuppressWarnings("resource")
+		Scanner scf=new Scanner(System.in);
+		String fileName=scf.nextLine();
+		
+		String mynewQuery="  PREFIX dbp:<http://dbpedia.org/ontology/> select ?x ?y ?z "
+				+ "where {?x dbp:"+relatedProp +" ?y;"
+				+ "dbp:"+ tempProp +" ?z.}";
+		ex.saveQuads(fileName,mynewQuery, tempProp, relatedProp);
+		
+		
+		
+		
 		/*
-		 * 
-		 * 
-		 * 
-		 * 
-		 * 
-		 * 
-		 * 
-		 * 
 		 * 
 		 * 
 		 * ArrayList<String> temp = ex.readFileTemporalFacts(file,
@@ -235,26 +265,6 @@ public class MainFunction {
 		 * " ?y." + "?x dbpedia-owl:"+ relatedWithoutTemp.get(choix2 - 1) +
 		 * " ?z." + "} LIMIT 100	";
 		 * 
-		 * String s2 = "PREFIX ot:<http://www.opentox.org/api/1.1#>" +
-		 * "PREFIX ota:<http://www.opentox.org/algorithmTypes.owl#>" +
-		 * "PREFIX owl:<http://www.w3.org/2002/07/owl#>" +
-		 * "PREFIX dc:<http://purl.org/dc/elements/1.1/>" +
-		 * "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>" +
-		 * "PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>" +
-		 * "PREFIX bibrdf:<http://zeitkunst.org/bibtex/0.1/bibtex.owl#>" +
-		 * "PREFIX bo:<http://www.blueobelisk.org/ontologies/chemoinformatics-algorithms/#>"
-		 * +
-		 * "select ?descriptor ?label ?cites ?doi ?definition ?requires ?category ?contributor"
-		 * + "	where {" +
-		 * "{{?descriptor rdf:type bo:Algorithm} UNION {?descriptor rdf:type bo:MolecularDescriptor}}."
-		 * + "	OPTIONAL {?descriptor rdfs:label ?label}." +
-		 * "          OPTIONAL {?descriptor bo:definition ?definition}." +
-		 * "        OPTIONAL {?descriptor dc:contributor ?contributor}." +
-		 * "      OPTIONAL {?descriptor bo:isClassifiedAs ?category}." +
-		 * "    OPTIONAL {?descriptor bo:requires?requires}." +
-		 * "  OPTIONAL {?descriptor bo:cites ?cites." +
-		 * "  ?cites bibrdf:hasTitle ?title." +
-		 * " OPTIONAL {?cites bo:DOI ?doi.}}.}";
 		 * 
 		 * String test = "PREFIX dbp:<http://dbpedia.org/ontology/>" +
 		 * "PREFIX dbpprop:<http://dbpedia.org/property/>" +
@@ -318,17 +328,4 @@ public class MainFunction {
 
 	}
 
-	// public ArrayList<String> geRelatedFact() {
-	//
-	//
-	// ArrayList<String> listRelaFacts = re
-	// .readFileRelatedFacts(listAtt, file);
-	//
-	// ArrayList<String> relatedWithoutTemp = re.relatedFactsWithoutTemp(
-	// listRelaFacts, geTemporalFact(), temporalPossibilities);
-	// System.out.println("***La liste des attributs reliés***");
-	//
-	// return p.duplicationDetector(relatedWithoutTemp);
-	//
-	// }
 }
