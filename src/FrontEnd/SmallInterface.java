@@ -2,9 +2,22 @@ package FrontEnd;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.util.ArrayList;
 
 import javax.swing.*;
 import javax.swing.border.Border;
+
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.ResultSet;
+
+import mining.ExtractTemporalFact;
 
 public class SmallInterface {
 	private JFrame mainFrame;
@@ -22,17 +35,18 @@ public class SmallInterface {
 	private void prepareGUI() {
 
 		jTextArea1 = new javax.swing.JTextArea();
-		jTextArea2 = new javax.swing.JTextArea();
 		jTextfileName1 = new javax.swing.JTextField();
 		jTextfileName2 = new javax.swing.JTextField();
 		jTextfileName1.setText("File Name");
-		jTextfileName2.setText("File Name");
+		jTextfileName2.setText("OutPut Quads File");
+
+		jLabel1 = new JLabel("", JLabel.CENTER);
 		jLabel2 = new javax.swing.JLabel();
 		jLabel3 = new javax.swing.JLabel();
-
-		jLabel5 = new javax.swing.JLabel();
-		jLabel1 = new JLabel("", JLabel.CENTER);
 		jLabel4 = new javax.swing.JLabel();
+		jLabel5 = new javax.swing.JLabel();
+		jLabel6 = new javax.swing.JLabel();
+
 		fc = new JFileChooser();
 
 		jButtonSendRequest = new javax.swing.JButton();
@@ -42,19 +56,22 @@ public class SmallInterface {
 		jLabel1.setText("@Temporal Annotation@");
 		jPic.setIcon(new javax.swing.ImageIcon(getClass().getResource(
 				"dbpedia.png")));
-		jTextArea1.setColumns(35);
+		jTextArea1.setColumns(40);
 		jTextArea1.setRows(12);
 		jTextArea1.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2,
 				Color.GRAY));
-		jButtonSendRequest.setText("Get Pairs");
+		jTextArea1.setEditable(false);
+		scroll = new JScrollPane(jTextArea1);
+
+		jButtonSendRequest.setText("Get SelectedItems");
 
 		jLabel5.setText("Construct Quads File");
-		jLabel2.setText("Find Pairs");
+		jLabel2.setText("Find SelectedItems");
 		jLabel2.setText("Extract all possibilities");
 		jLabel3.setText("Request Results");
 		jLabel4.setText("Results With Label");
 		mainFrame = new JFrame("Quads DBpedia Extractor");
-		mainFrame.setSize(1200, 600);
+		mainFrame.setSize(1200, 650);
 		mainFrame.setDefaultLookAndFeelDecorated(true);
 		mainFrame.setLocationRelativeTo(null);
 		mainFrame.setLayout(new GridLayout(1, 1));
@@ -67,18 +84,14 @@ public class SmallInterface {
 		controlPanel = new JPanel();
 		controlPanel.setLayout(new FlowLayout());
 
-		// mainFrame.add(jLabel1);
-		// mainFrame.add(jPic);
 		mainFrame.add(controlPanel);
-		// mainFrame.add(statusLabel);
 		mainFrame.setVisible(true);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void showGroupLayoutDemo() {
 		JPanel panel = new JPanel();
-		// panel.setBackground(Color.WHITE);
-		// panel.setSize(200, 200);
+		panel.setBackground(Color.WHITE);
 		GroupLayout layout = new GroupLayout(panel);
 		layout.setAutoCreateGaps(true);
 		layout.setAutoCreateContainerGaps(true);
@@ -104,18 +117,118 @@ public class SmallInterface {
 			}
 		});
 		JButton jButtonSetQuads = new JButton("Validation : Build Quads file");
-		JButton jButtonFindCouple = new JButton("Find Couples");
-		jButtonFindCouple.addActionListener(new java.awt.event.ActionListener() {
+
+		jButtonSetQuads.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				jButtonFindCoupleActionPerformed(evt);
+				jButtonSetQuadsActionPerformed(evt);
 			}
 
-			private void jButtonFindCoupleActionPerformed(ActionEvent evt) {
-				// TODO Auto-generated method stub
-				
-			}});
-		JButton jButtonRequest = new JButton("Send Request ");
+			private void jButtonSetQuadsActionPerformed(ActionEvent evt) {
+				String fileQuads = jTextfileName2.getText();
+				String SelectedItem = jList1.getSelectedItem().toString();
+				String tempProp = SelectedItem.substring(0,
+						SelectedItem.indexOf(","));
 
+				String relatedProp = SelectedItem.substring(
+						SelectedItem.indexOf(",") + 1, SelectedItem.length());
+				String mynewQuery = "  PREFIX dbp:<http://dbpedia.org/ontology/> select ?x ?y ?z "
+						+ "where {?x dbp:"
+						+ relatedProp
+						+ " ?y;"
+						+ "dbp:"
+						+ tempProp + " ?z.}";
+				ExtractTemporalFact ex = new ExtractTemporalFact();
+				ex.saveQuads(fileQuads, mynewQuery, tempProp, relatedProp);
+
+			}
+		});
+
+		JButton jButtonFindCouple = new JButton("Find Couples");
+		jButtonFindCouple
+				.addActionListener(new java.awt.event.ActionListener() {
+					public void actionPerformed(java.awt.event.ActionEvent evt) {
+						jButtonFindCoupleActionPerformed(evt);
+					}
+
+					private void jButtonFindCoupleActionPerformed(
+							ActionEvent evt) {
+						MainFunction mf = new MainFunction();
+						ExtractTemporalFact ex = new ExtractTemporalFact();
+						ArrayList<String> cp = ex.tFactsList("file/"
+								+ jTextfileName1.getText(), mf.geTemporalFact());
+						String fileSelectedItem = mf.getPairListAtt("file/"
+								+ jTextfileName1.getText(), cp);
+
+						try {
+
+							@SuppressWarnings("resource")
+							BufferedReader r2 = new BufferedReader(
+									new FileReader(new File(fileSelectedItem)));
+
+							while (r2.readLine() != null) {
+								if (r2.readLine().toLowerCase()
+										.endsWith("date") == false)
+									if (r2.readLine().toLowerCase()
+											.endsWith("year") == false) {
+										jList1.addItem(r2.readLine());
+
+									}
+
+							}
+
+						}
+
+						catch (Exception e) {
+							System.out.println(e.getMessage());
+						}
+
+					}
+				});
+		JButton jButtonRequest = new JButton("Send Request ");
+		jButtonRequest.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				jButtonRequestActionPerformed(evt);
+			}
+
+			private void jButtonRequestActionPerformed(ActionEvent evt) {
+				String SelectedItem = jList1.getSelectedItem().toString();
+				String tempProp = SelectedItem.substring(0,
+						SelectedItem.indexOf(","));
+
+				String relatedProp = SelectedItem.substring(
+						SelectedItem.indexOf(",") + 1, SelectedItem.length());
+
+				System.out.println("SPARQL Query");
+
+				String myQuery = " PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> PREFIX dbp:<http://dbpedia.org/ontology/> select (CONCAT(?label1, ' "
+						+ relatedProp
+						+ " ', ?label2, ' : ', ?date) AS ?result)"
+						+ "where {?subject dbp:"
+						+ relatedProp
+						+ " ?place;"
+						+ "dbp:"
+						+ tempProp
+						+ " ?date;"
+						+ "rdfs:label ?label1 ."
+						+ "?place rdfs:label ?label2 ."
+						+ "FILTER(lang(?label1)='en' && lang(?label2)='en')}"
+						+ "LIMIT 100 OFFSET 200";
+
+				Query query = QueryFactory.create(myQuery);
+				QueryExecution qexec = QueryExecutionFactory.sparqlService(
+						"http://dbpedia.org/sparql", query);
+				ResultSet results = qexec.execSelect();
+				String rst = "";
+				while (results.hasNext()) {
+					QuerySolution qs = results.nextSolution();
+					if (qs.getLiteral("result") != null) {
+
+						rst += qs.getLiteral("result").toString() + "\n";
+					}
+				}
+				jTextArea1.setText(rst);
+			}
+		});
 		layout.setHorizontalGroup(layout
 				.createSequentialGroup()
 				.addGroup(
@@ -148,10 +261,13 @@ public class SmallInterface {
 																.addComponent(
 																		jLabel4)
 																.addComponent(
-																		jTextArea1)
-
+																		scroll)
 																.addComponent(
-																		jButtonSetQuads)))
+																		jTextfileName2)
+																.addComponent(
+																		jButtonSetQuads)
+																.addComponent(
+																		jLabel6)))
 
 				)
 
@@ -162,8 +278,9 @@ public class SmallInterface {
 				.addComponent(jButtonExtract).addComponent(jLabel3)
 				.addComponent(jLabel2).addComponent(jButtonFindCouple)
 				.addComponent(jList1).addComponent(jButtonRequest)
-				.addComponent(jLabel4).addComponent(jTextArea1)
-				.addComponent(jButtonSetQuads));
+				.addComponent(jLabel4).addComponent(scroll)
+				.addComponent(jTextfileName2).addComponent(jButtonSetQuads)
+				.addComponent(jLabel6));
 		panel.setLayout(layout);
 		Border paddingBorder = BorderFactory.createEmptyBorder(15, 15, 15, 15);
 
@@ -182,8 +299,9 @@ public class SmallInterface {
 	private javax.swing.JLabel jLabel3;
 	private javax.swing.JLabel jLabel4;
 	private javax.swing.JLabel jLabel5;
+	private javax.swing.JLabel jLabel6;
+	private javax.swing.JScrollPane scroll;
 	private javax.swing.JTextArea jTextArea1;
-	private javax.swing.JTextArea jTextArea2;
 	private JFileChooser fc;
 	private javax.swing.JLabel jPic;
 	private javax.swing.JComboBox jList1;

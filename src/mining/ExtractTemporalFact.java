@@ -296,7 +296,7 @@ public class ExtractTemporalFact {
 		return result;
 	}
 
-	public void saveQuads(String fileName, String sQuery, String tempProp,
+	public String saveQuads(String fileName, String sQuery, String tempProp,
 			String relatedProp) {
 
 		Writer writer = null;
@@ -326,6 +326,8 @@ public class ExtractTemporalFact {
 		} catch (Exception ex) {
 			System.out.println("Here Exception " + ex.getMessage());
 		}
+		
+		return fileName+" Is saved";
 
 	}
 
