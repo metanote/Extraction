@@ -147,6 +147,7 @@ public class ExtractTemporalFact {
 	public ArrayList<String> tFactsList(String file,
 			ArrayList<String> temporalFacts) {
 		ArrayList<String> facts = new ArrayList<String>();
+		ArrayList<String> facts2 = new ArrayList<String>();
 		ArrayList<String> filtredFacts = new ArrayList<String>();
 		try {
 			InputStream flux = new FileInputStream(file);
@@ -157,13 +158,20 @@ public class ExtractTemporalFact {
 
 			while ((line = buff.readLine()) != null) {
 				for (String tf : temporalFacts)
-					if (line.toLowerCase().endsWith(tf))
+					if (line.toLowerCase().endsWith(tf)
+							|| (line.substring(0, line.length() - 1))
+									.toLowerCase().endsWith(tf))
 						facts.add(line);
 			}
 		} catch (Exception Ex) {
 			System.out.println("Exception is detected " + Ex.getMessage());
 		}
-		filtredFacts = filterFacts(facts);
+		// System.out.println("with duplication " + facts.size());
+		facts2 = removeDuplicates(facts);
+		// System.out.println("without duplication " + facts2.size());
+
+		filtredFacts = filterFacts(facts2);
+		// System.out.println("FACT WITHOUT FILTER" + filtredFacts);
 		return filtredFacts;
 	}
 
@@ -175,7 +183,10 @@ public class ExtractTemporalFact {
 				flist.add(str);
 			} else
 				flist.add(f);
+
+		System.out.println("Final list " + flist.size());
 		return flist;
+
 	}
 
 	public ArrayList<String> findMotifs(ArrayList<String> cp,
@@ -187,23 +198,21 @@ public class ExtractTemporalFact {
 			for (String s : cp)
 				for (String t : tp) {
 					String motif = "";
-					if (s.toLowerCase().endsWith(t)) {
-						// System.out.println(s);
+					if (s.toLowerCase().endsWith(t)
+							|| s.toLowerCase().endsWith(t + "s")) {
 						int index = s.toLowerCase().indexOf(t);
 						if (index > 0) {
-
 							motif = s.substring(0, index);
-							// System.out.println("Motif "+motif);
 							motifList.add(motif);
-							// buff.close();
-
 						}
 					}
 				}
+
 		} catch (Exception Ex) {
 			System.out.println("Exception is detected " + Ex.getMessage());
 		}
 
+		System.out.println(motifList.size());
 		return motifList;
 	}
 
@@ -308,7 +317,7 @@ public class ExtractTemporalFact {
 
 			ResultSet results = qexec.execSelect();
 			writer = new BufferedWriter(new OutputStreamWriter(
-					new FileOutputStream("file/" + fileName), "utf-8"));
+					new FileOutputStream("file/SPOTBase/" + fileName), "utf-8"));
 			while (results.hasNext()) {
 				QuerySolution qs = results.nextSolution();
 				if (qs.getResource("x") != null) {
@@ -326,8 +335,8 @@ public class ExtractTemporalFact {
 		} catch (Exception ex) {
 			System.out.println("Here Exception " + ex.getMessage());
 		}
-		
-		return fileName+" Is saved";
+
+		return fileName + " Is saved";
 
 	}
 

@@ -72,8 +72,25 @@ public class MainFunction {
 			file2 = "file/properties.txt";
 
 		ArrayList<String> cp = ex.tFactsList(file2, temporalPossibilities);
-
+		System.out.println("temporal facts "+cp);
+		System.out.println("find motifs "+ex.findMotifs(cp,temporalPossibilities));
+		System.out.println("find pairs ");
+		ArrayList<ArrayList<StringPair>> listp=new ArrayList<ArrayList<StringPair>> ();
+		 listp=ex.findPairs(ex.findMotifs(cp,temporalPossibilities), "file/FileProp.txt");
+		 
+		 for (ArrayList<StringPair> sp: listp)
+			 for(StringPair s:sp )
+				 for(String tp:temporalPossibilities)
+					 if(s.getRightString().toLowerCase().endsWith(tp)||s.getRightString().toLowerCase().endsWith(tp+"s"))
+						 System.out.println("NON "+s.getRightString()+" left "+s.getLeftString());
+					 else
+						 System.out.println("OUI "+s.getRightString());
+							 
+		
 		// print in file
+		
+		
+		
 		System.out.println("Now Expert choice ");
 
 		// return line pair
@@ -82,6 +99,8 @@ public class MainFunction {
 		int lineNumber = sca.nextInt();
 
 		String pair = ex.returnPair(lineNumber, "file/rst.txt");
+		
+		
 
 		// System.out.println("your couple is " + pair);
 
@@ -151,12 +170,13 @@ public class MainFunction {
 		ArrayList<ArrayList<StringPair>> listPairs = new ArrayList<ArrayList<StringPair>>();
 		ArrayList<String> listMotifs = new ArrayList<String>();
 		listMotifs = ex.findMotifs(cp, temporalPossibilities);
-
+		System.out.println("list Mofits "+listMotifs);
 		ArrayList<String> listMWD = new ArrayList<String>();
 
 		// filter duplicate
 
 		listMWD = ex.removeDuplicates(listMotifs);
+	//	System.out.println("list Mofits "+listMWD.size());
 		listPairs = ex.findPairs(listMWD, file2);
 
 		// Liste des vrais couples

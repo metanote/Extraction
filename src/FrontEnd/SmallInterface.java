@@ -5,7 +5,8 @@ import java.awt.event.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.util.ArrayList;
+import java.util.*;
+import java.util.List;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -37,11 +38,12 @@ public class SmallInterface {
 		jTextArea1 = new javax.swing.JTextArea();
 		jTextfileName1 = new javax.swing.JTextField();
 		jTextfileName2 = new javax.swing.JTextField();
-		jTextfileName1.setText("File Name");
+		jTextfileName1.setText("Input File Name .txt");
 		jTextfileName2.setText("OutPut Quads File");
 
 		jLabel1 = new JLabel("", JLabel.CENTER);
 		jLabel2 = new javax.swing.JLabel();
+		jLabelRst = new javax.swing.JLabel();
 		jLabel3 = new javax.swing.JLabel();
 		jLabel4 = new javax.swing.JLabel();
 		jLabel5 = new javax.swing.JLabel();
@@ -71,7 +73,7 @@ public class SmallInterface {
 		jLabel3.setText("Request Results");
 		jLabel4.setText("Results With Label");
 		mainFrame = new JFrame("Quads DBpedia Extractor");
-		mainFrame.setSize(1200, 650);
+		mainFrame.setSize(1200, 670);
 		mainFrame.setDefaultLookAndFeelDecorated(true);
 		mainFrame.setLocationRelativeTo(null);
 		mainFrame.setLayout(new GridLayout(1, 1));
@@ -96,10 +98,22 @@ public class SmallInterface {
 		layout.setAutoCreateGaps(true);
 		layout.setAutoCreateContainerGaps(true);
 		jButtonValidate = new javax.swing.JButton();
+		jButtonClean = new javax.swing.JButton();
 		jButtonValidate.setText("Save in File");
 		String defData[] = { "Temporal Facts List" };
 		jList1 = new javax.swing.JComboBox(defData);
 		fc.setDialogTitle("Choose file");
+		JButton jButtonClean = new JButton("Clear Textarea");
+		jButtonClean.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				jButtonCleanActionPerformed(evt);
+			}
+
+			private void jButtonCleanActionPerformed(ActionEvent evt) {
+				jTextArea1.setText("");
+
+			}
+		});
 		JButton jButtonExtract = new JButton("Extract From DBpedia");
 		jButtonExtract.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -111,7 +125,7 @@ public class SmallInterface {
 				String fileName = jTextfileName1.getText();
 				String rst = sd.fileProperties(fileName);
 				if (rst.endsWith(".txt"))
-					jLabel3.setText(rst + " have been created");
+					jLabel3.setText(rst + " has been created");
 				else
 					jLabel3.setText("Verify your input");
 			}
@@ -139,6 +153,7 @@ public class SmallInterface {
 						+ tempProp + " ?z.}";
 				ExtractTemporalFact ex = new ExtractTemporalFact();
 				ex.saveQuads(fileQuads, mynewQuery, tempProp, relatedProp);
+				jLabelRst.setText(fileQuads + " is saved now");
 
 			}
 		});
@@ -146,6 +161,8 @@ public class SmallInterface {
 		JButton jButtonFindCouple = new JButton("Find Couples");
 		jButtonFindCouple
 				.addActionListener(new java.awt.event.ActionListener() {
+					public String inits[] = new String[154];
+
 					public void actionPerformed(java.awt.event.ActionEvent evt) {
 						jButtonFindCoupleActionPerformed(evt);
 					}
@@ -164,17 +181,20 @@ public class SmallInterface {
 							@SuppressWarnings("resource")
 							BufferedReader r2 = new BufferedReader(
 									new FileReader(new File(fileSelectedItem)));
-
+							int i = 0;
 							while (r2.readLine() != null) {
-								if (r2.readLine().toLowerCase()
-										.endsWith("date") == false)
-									if (r2.readLine().toLowerCase()
-											.endsWith("year") == false) {
-										jList1.addItem(r2.readLine());
-
-									}
+								String a = r2.readLine();
+								inits[i] = a;
+								i++;
 
 							}
+
+							List list = new ArrayList(Arrays.asList(inits));
+
+							Collections.sort(list);
+
+							for (int n = 0; n < list.size(); n++)
+								jList1.addItem(list.get(n));
 
 						}
 
@@ -198,8 +218,6 @@ public class SmallInterface {
 				String relatedProp = SelectedItem.substring(
 						SelectedItem.indexOf(",") + 1, SelectedItem.length());
 
-				System.out.println("SPARQL Query");
-
 				String myQuery = " PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> PREFIX dbp:<http://dbpedia.org/ontology/> select (CONCAT(?label1, ' "
 						+ relatedProp
 						+ " ', ?label2, ' : ', ?date) AS ?result)"
@@ -219,12 +237,19 @@ public class SmallInterface {
 						"http://dbpedia.org/sparql", query);
 				ResultSet results = qexec.execSelect();
 				String rst = "";
+				if (!results.hasNext())
+					
+					rst += "No result";
+				else
 				while (results.hasNext()) {
 					QuerySolution qs = results.nextSolution();
+
 					if (qs.getLiteral("result") != null) {
 
 						rst += qs.getLiteral("result").toString() + "\n";
 					}
+					
+
 				}
 				jTextArea1.setText(rst);
 			}
@@ -263,11 +288,14 @@ public class SmallInterface {
 																.addComponent(
 																		scroll)
 																.addComponent(
+																		jButtonClean)
+																.addComponent(
 																		jTextfileName2)
 																.addComponent(
 																		jButtonSetQuads)
+
 																.addComponent(
-																		jLabel6)))
+																		jLabelRst)))
 
 				)
 
@@ -279,8 +307,8 @@ public class SmallInterface {
 				.addComponent(jLabel2).addComponent(jButtonFindCouple)
 				.addComponent(jList1).addComponent(jButtonRequest)
 				.addComponent(jLabel4).addComponent(scroll)
-				.addComponent(jTextfileName2).addComponent(jButtonSetQuads)
-				.addComponent(jLabel6));
+				.addComponent(jButtonClean).addComponent(jTextfileName2)
+				.addComponent(jButtonSetQuads).addComponent(jLabelRst));
 		panel.setLayout(layout);
 		Border paddingBorder = BorderFactory.createEmptyBorder(15, 15, 15, 15);
 
@@ -294,12 +322,14 @@ public class SmallInterface {
 
 	private javax.swing.JButton jButtonSendRequest;
 	private javax.swing.JButton jButtonValidate;
+	private javax.swing.JButton jButtonClean;
 	private javax.swing.JLabel jLabel1;
 	private javax.swing.JLabel jLabel2;
 	private javax.swing.JLabel jLabel3;
 	private javax.swing.JLabel jLabel4;
 	private javax.swing.JLabel jLabel5;
 	private javax.swing.JLabel jLabel6;
+	private javax.swing.JLabel jLabelRst;
 	private javax.swing.JScrollPane scroll;
 	private javax.swing.JTextArea jTextArea1;
 	private JFileChooser fc;
