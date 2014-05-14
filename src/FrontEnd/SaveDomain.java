@@ -16,13 +16,14 @@ public class SaveDomain {
 
 	public String fileProperties(String fileName)
 
-	{ // save all properties from dbpedia
+	{
+
+		// save all properties from DBpedia
 		Writer writer = null;
 		try {
-			
-	
+
 			writer = new BufferedWriter(new OutputStreamWriter(
-					new FileOutputStream("file/"+fileName), "utf-8"));
+					new FileOutputStream("file/" + fileName), "utf-8"));
 			String sQuery = "PREFIX rdfs:<http://www.w3.org/2000/01/rdf-schema#> SELECT DISTINCT ?prop WHERE { ?prop rdfs:domain ?y }";
 
 			Query query = QueryFactory.create(sQuery);
@@ -32,30 +33,28 @@ public class SaveDomain {
 
 			ResultSet results = qexec.execSelect();
 
-			// ResultSetFormatter.out(results);
-			System.out.println("write result in file");
 			while (results.hasNext()) {
 				QuerySolution qs = results.nextSolution();
 				if (qs.getResource("prop") != null) {
 					String uri = qs.getResource("prop").getURI();
-					if (uri.contains("http://dbpedia.org/ontology/"))
-					{
-					String newuri=uri.substring(28, uri.length()) ;
-					if(newuri.length()>2)
-					if (newuri.contains("/")){
-						String str = newuri.substring(newuri.indexOf("/") + 1, newuri.length());
-						writer.write(str+"\n");
-					} else
-						writer.write(newuri+"\n");
+					if (uri.contains("http://dbpedia.org/ontology/")) {
+						String newuri = uri.substring(28, uri.length());
+						if (newuri.length() > 2)
+							if (newuri.contains("/")) {
+								String str = newuri.substring(
+										newuri.indexOf("/") + 1,
+										newuri.length());
+								writer.write(str + "\n");
+							} else
+								writer.write(newuri + "\n");
 					}
-					}}
-				
-			
+				}
+			}
+
 			writer.close();
-			System.out.println("All properties have been written in file");
 		} catch (Exception e) {
 			System.out.print("You have an exception  " + e.getMessage());
 		}
-		return "file/"+fileName;
+		return "file/" + fileName;
 	}
 }

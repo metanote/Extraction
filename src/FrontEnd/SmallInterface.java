@@ -123,10 +123,12 @@ public class SmallInterface {
 			private void jButtonExtractActionPerformed(ActionEvent evt) {
 				SaveDomain sd = new SaveDomain();
 				String fileName = jTextfileName1.getText();
-				String rst = sd.fileProperties(fileName);
-				if (rst.endsWith(".txt"))
-					jLabel3.setText(rst + " has been created");
-				else
+
+				if (fileName.endsWith(".txt")) {
+
+					String file = sd.fileProperties(fileName);
+					jLabel3.setText(file + " has been created");
+				} else
 					jLabel3.setText("Verify your input");
 			}
 		});
@@ -161,7 +163,7 @@ public class SmallInterface {
 		JButton jButtonFindCouple = new JButton("Find Couples");
 		jButtonFindCouple
 				.addActionListener(new java.awt.event.ActionListener() {
-					public String inits[] = new String[154];
+					public String inits[] = new String[1000];
 
 					public void actionPerformed(java.awt.event.ActionEvent evt) {
 						jButtonFindCoupleActionPerformed(evt);
@@ -175,26 +177,26 @@ public class SmallInterface {
 								+ jTextfileName1.getText(), mf.geTemporalFact());
 						String fileSelectedItem = mf.getPairListAtt("file/"
 								+ jTextfileName1.getText(), cp);
-
+						Set<String> lines = new HashSet<String>();
 						try {
 
 							@SuppressWarnings("resource")
 							BufferedReader r2 = new BufferedReader(
 									new FileReader(new File(fileSelectedItem)));
-							int i = 0;
+
 							while (r2.readLine() != null) {
-								String a = r2.readLine();
-								inits[i] = a;
-								i++;
+								lines.add(r2.readLine());
 
 							}
+							for (String s : lines)
+								if(s!=null)
+								jList1.addItem(s);
 
-							List list = new ArrayList(Arrays.asList(inits));
-
-							Collections.sort(list);
-
-							for (int n = 0; n < list.size(); n++)
-								jList1.addItem(list.get(n));
+							// Set storedSet = new TreeSet(lines);
+							// Iterator<String> iterator = storedSet.iterator();
+							// iterator.next();
+							// while (iterator.hasNext())
+							// jList1.addItem(iterator.next());
 
 						}
 
@@ -238,19 +240,18 @@ public class SmallInterface {
 				ResultSet results = qexec.execSelect();
 				String rst = "";
 				if (!results.hasNext())
-					
+
 					rst += "No result";
 				else
-				while (results.hasNext()) {
-					QuerySolution qs = results.nextSolution();
+					while (results.hasNext()) {
+						QuerySolution qs = results.nextSolution();
 
-					if (qs.getLiteral("result") != null) {
+						if (qs.getLiteral("result") != null) {
 
-						rst += qs.getLiteral("result").toString() + "\n";
+							rst += qs.getLiteral("result").toString() + "\n";
+						}
+
 					}
-					
-
-				}
 				jTextArea1.setText(rst);
 			}
 		});

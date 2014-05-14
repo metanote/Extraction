@@ -26,7 +26,8 @@ public class ExtractTemporalFact {
 
 		temporalPossibilities.add("year");
 		temporalPossibilities.add("date");
-
+		temporalPossibilities.add("years");
+		temporalPossibilities.add("dates");
 		return temporalPossibilities;
 
 	}
@@ -150,28 +151,29 @@ public class ExtractTemporalFact {
 		ArrayList<String> facts2 = new ArrayList<String>();
 		ArrayList<String> filtredFacts = new ArrayList<String>();
 		try {
-			InputStream flux = new FileInputStream(file);
-			InputStreamReader lecture = new InputStreamReader(flux);
-			@SuppressWarnings("resource")
-			BufferedReader buff = new BufferedReader(lecture);
-			String line;
+			for (String tf : temporalFacts) {
+				InputStream flux = new FileInputStream(file);
+				InputStreamReader lecture = new InputStreamReader(flux);
+				@SuppressWarnings("resource")
+				BufferedReader buff = new BufferedReader(lecture);
+				String line;
 
-			while ((line = buff.readLine()) != null) {
-				for (String tf : temporalFacts)
-					if (line.toLowerCase().endsWith(tf)
-							|| (line.substring(0, line.length() - 1))
-									.toLowerCase().endsWith(tf))
+				while ((line = buff.readLine()) != null) {
+
+					if ((line.toLowerCase().endsWith(tf) || (line.substring(0,
+							line.length() - 1)).toLowerCase().endsWith(tf))) {
 						facts.add(line);
+					}
+				}
+				buff.close();
+
 			}
+
 		} catch (Exception Ex) {
 			System.out.println("Exception is detected " + Ex.getMessage());
 		}
-		// System.out.println("with duplication " + facts.size());
 		facts2 = removeDuplicates(facts);
-		// System.out.println("without duplication " + facts2.size());
-
 		filtredFacts = filterFacts(facts2);
-		// System.out.println("FACT WITHOUT FILTER" + filtredFacts);
 		return filtredFacts;
 	}
 
@@ -184,7 +186,6 @@ public class ExtractTemporalFact {
 			} else
 				flist.add(f);
 
-		System.out.println("Final list " + flist.size());
 		return flist;
 
 	}
@@ -212,7 +213,7 @@ public class ExtractTemporalFact {
 			System.out.println("Exception is detected " + Ex.getMessage());
 		}
 
-		System.out.println(motifList.size());
+		// System.out.println(motifList.size());
 		return motifList;
 	}
 
@@ -241,9 +242,11 @@ public class ExtractTemporalFact {
 		BufferedReader buff = new BufferedReader(lecture);
 		String line;
 		StringPair p = null;
+		// here motif (line.toLowerCase().contains(motif.toLowerCase()))
 		try {
 			while ((line = buff.readLine()) != null) {
-				if (line.toLowerCase().contains(motif.toLowerCase())) {
+				if (line.toLowerCase().matches(
+						"(.*)" + motif.toLowerCase() + "(.*)")) {
 					p = new StringPair(motif, line);
 					pList.add(p);
 				}

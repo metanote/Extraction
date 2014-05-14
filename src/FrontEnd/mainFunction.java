@@ -72,9 +72,9 @@ public class MainFunction {
 			file2 = "file/properties.txt";
 
 		ArrayList<String> cp = ex.tFactsList(file2, temporalPossibilities);
-		System.out.println("temporal facts "+cp);
-		System.out.println("find motifs "+ex.findMotifs(cp,temporalPossibilities));
-		System.out.println("find pairs ");
+//		System.out.println("temporal facts "+cp);
+//		System.out.println("find motifs "+ex.findMotifs(cp,temporalPossibilities));
+//		System.out.println("find pairs ");
 		ArrayList<ArrayList<StringPair>> listp=new ArrayList<ArrayList<StringPair>> ();
 		 listp=ex.findPairs(ex.findMotifs(cp,temporalPossibilities), "file/FileProp.txt");
 		 
@@ -157,11 +157,11 @@ public class MainFunction {
 	public ArrayList<String> geTemporalFact() {
 		temporalPossibilities.add("year");
 		temporalPossibilities.add("date");
+		temporalPossibilities.add("years");
+		temporalPossibilities.add("dates");
+		
 
-		ArrayList<String> temp = ex.readFileTemporalFacts(file,
-				temporalPossibilities);
-
-		return p.duplicationDetector(temp);
+		return temporalPossibilities;
 
 	}
 
@@ -170,13 +170,13 @@ public class MainFunction {
 		ArrayList<ArrayList<StringPair>> listPairs = new ArrayList<ArrayList<StringPair>>();
 		ArrayList<String> listMotifs = new ArrayList<String>();
 		listMotifs = ex.findMotifs(cp, temporalPossibilities);
-		System.out.println("list Mofits "+listMotifs);
+	//	System.out.println("list Mofits "+listMotifs);
 		ArrayList<String> listMWD = new ArrayList<String>();
 
 		// filter duplicate
 
 		listMWD = ex.removeDuplicates(listMotifs);
-	//	System.out.println("list Mofits "+listMWD.size());
+	//	System.out.println("list Mofits "+listMWD);
 		listPairs = ex.findPairs(listMWD, file2);
 
 		// Liste des vrais couples
@@ -211,15 +211,15 @@ public class MainFunction {
 					finallist.add(so);
 				}
 			}
-
-		ArrayList<StringPair> temp = new ArrayList<StringPair>();
-		temp = ex.removeDuplicatesPairs(finallist);
+		//ArrayList<StringPair> temp = new ArrayList<StringPair>();
+		//temp = ex.removeDuplicatesPairs(finallist);
+//		
 		Writer w2 = null;
 		try {
 
 			w2 = new BufferedWriter(new OutputStreamWriter(
-					new FileOutputStream("file/FilePairs.txt"), "utf-8"));
-			for (StringPair p : temp) {
+					new FileOutputStream("file/FilePairsResult.txt"), "utf-8"));
+			for (StringPair p : finallist) {
 				w2.write(p.getLeftString() + "," + p.getRightString() + "\n");
 			}
 			w2.close();
@@ -227,7 +227,7 @@ public class MainFunction {
 			System.out.println("Exception " + e.getMessage());
 		}
 
-		return "file/FilePairs.txt";
+		return "file/FilePairsResult.txt";
 	}
 
 	public ArrayList<String> getAttribut() {
