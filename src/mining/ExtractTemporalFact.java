@@ -326,7 +326,7 @@ public class ExtractTemporalFact {
 				if (qs.getResource("x") != null) {
 
 					writer.write(qs.getResource("x").toString() + " -- "
-							+ relatedProp + " -- "
+							+ "http://dbpedia.org/ontology/"+relatedProp + " -- "
 							+ qs.getResource("y").toString() + " : "
 							+ qs.getLiteral("z").toString().substring(0, 10)
 							+ "\n");

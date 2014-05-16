@@ -6,7 +6,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.*;
-import java.util.List;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -40,15 +39,12 @@ public class SmallInterface {
 		jTextfileName2 = new javax.swing.JTextField();
 		jTextfileName1.setText("Input File Name .txt");
 		jTextfileName2.setText("OutPut Quads File");
-
 		jLabel1 = new JLabel("", JLabel.CENTER);
 		jLabel2 = new javax.swing.JLabel();
 		jLabelRst = new javax.swing.JLabel();
 		jLabel3 = new javax.swing.JLabel();
 		jLabel4 = new javax.swing.JLabel();
 		jLabel5 = new javax.swing.JLabel();
-		jLabel6 = new javax.swing.JLabel();
-
 		fc = new JFileChooser();
 
 		jButtonSendRequest = new javax.swing.JButton();
@@ -98,7 +94,6 @@ public class SmallInterface {
 		layout.setAutoCreateGaps(true);
 		layout.setAutoCreateContainerGaps(true);
 		jButtonValidate = new javax.swing.JButton();
-		jButtonClean = new javax.swing.JButton();
 		jButtonValidate.setText("Save in File");
 		String defData[] = { "Temporal Facts List" };
 		jList1 = new javax.swing.JComboBox(defData);
@@ -163,8 +158,6 @@ public class SmallInterface {
 		JButton jButtonFindCouple = new JButton("Find Couples");
 		jButtonFindCouple
 				.addActionListener(new java.awt.event.ActionListener() {
-					public String inits[] = new String[1000];
-
 					public void actionPerformed(java.awt.event.ActionEvent evt) {
 						jButtonFindCoupleActionPerformed(evt);
 					}
@@ -189,14 +182,8 @@ public class SmallInterface {
 
 							}
 							for (String s : lines)
-								if(s!=null)
-								jList1.addItem(s);
-
-							// Set storedSet = new TreeSet(lines);
-							// Iterator<String> iterator = storedSet.iterator();
-							// iterator.next();
-							// while (iterator.hasNext())
-							// jList1.addItem(iterator.next());
+								if (s != null)
+									jList1.addItem(s);
 
 						}
 
@@ -323,13 +310,11 @@ public class SmallInterface {
 
 	private javax.swing.JButton jButtonSendRequest;
 	private javax.swing.JButton jButtonValidate;
-	private javax.swing.JButton jButtonClean;
 	private javax.swing.JLabel jLabel1;
 	private javax.swing.JLabel jLabel2;
 	private javax.swing.JLabel jLabel3;
 	private javax.swing.JLabel jLabel4;
 	private javax.swing.JLabel jLabel5;
-	private javax.swing.JLabel jLabel6;
 	private javax.swing.JLabel jLabelRst;
 	private javax.swing.JScrollPane scroll;
 	private javax.swing.JTextArea jTextArea1;

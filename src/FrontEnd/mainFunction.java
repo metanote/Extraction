@@ -170,13 +170,9 @@ public class MainFunction {
 		ArrayList<ArrayList<StringPair>> listPairs = new ArrayList<ArrayList<StringPair>>();
 		ArrayList<String> listMotifs = new ArrayList<String>();
 		listMotifs = ex.findMotifs(cp, temporalPossibilities);
-	//	System.out.println("list Mofits "+listMotifs);
 		ArrayList<String> listMWD = new ArrayList<String>();
-
 		// filter duplicate
-
 		listMWD = ex.removeDuplicates(listMotifs);
-	//	System.out.println("list Mofits "+listMWD);
 		listPairs = ex.findPairs(listMWD, file2);
 
 		// Liste des vrais couples
@@ -211,9 +207,7 @@ public class MainFunction {
 					finallist.add(so);
 				}
 			}
-		//ArrayList<StringPair> temp = new ArrayList<StringPair>();
-		//temp = ex.removeDuplicatesPairs(finallist);
-//		
+		
 		Writer w2 = null;
 		try {
 
