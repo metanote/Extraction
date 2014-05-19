@@ -3,8 +3,16 @@ package FrontEnd;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.util.*;
 
 import javax.swing.*;
@@ -45,8 +53,9 @@ public class SmallInterface {
 		jLabel3 = new javax.swing.JLabel();
 		jLabel4 = new javax.swing.JLabel();
 		jLabel5 = new javax.swing.JLabel();
+		jLabel6 = new javax.swing.JLabel();
 		fc = new JFileChooser();
-
+		jButtonSaveHisto = new javax.swing.JButton();
 		jButtonSendRequest = new javax.swing.JButton();
 		jPic = new javax.swing.JLabel("", JLabel.CENTER);
 
@@ -93,20 +102,47 @@ public class SmallInterface {
 		GroupLayout layout = new GroupLayout(panel);
 		layout.setAutoCreateGaps(true);
 		layout.setAutoCreateContainerGaps(true);
+
+	
+
 		jButtonValidate = new javax.swing.JButton();
 		jButtonValidate.setText("Save in File");
 		String defData[] = { "Temporal Facts List" };
 		jList1 = new javax.swing.JComboBox(defData);
 		fc.setDialogTitle("Choose file");
-		JButton jButtonClean = new JButton("Clear Textarea");
+		JButton jButtonClean = new JButton("Delete And Clear TextArea");
 		jButtonClean.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				jButtonCleanActionPerformed(evt);
 			}
 
 			private void jButtonCleanActionPerformed(ActionEvent evt) {
+				jLabel6.setText("");
+				
 				jTextArea1.setText("");
-
+				// Append file with 0
+				String SelectedItem = jList1.getSelectedItem().toString();
+				String tempProp = SelectedItem.substring(0,
+						SelectedItem.indexOf(","));
+				String relatedProp = SelectedItem.substring(
+						SelectedItem.indexOf(",") + 1, SelectedItem.length());	
+				//create file and save the properties with O 
+				
+				try {
+					 String filename= "file/SPOTBase/historic.csv";
+					    FileWriter fw = new FileWriter(filename,true); 
+					    Dates d=new Dates();
+					    fw.write(relatedProp+","+tempProp+",0,,"+d.date()+",\n");
+					    fw.close();
+				
+					
+			
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			
+				jLabel6.setText("Append file historic.csv");	
+				
 			}
 		});
 		JButton jButtonExtract = new JButton("Extract From DBpedia");
@@ -135,10 +171,12 @@ public class SmallInterface {
 			}
 
 			private void jButtonSetQuadsActionPerformed(ActionEvent evt) {
-				String fileQuads = jTextfileName2.getText();
+
 				String SelectedItem = jList1.getSelectedItem().toString();
 				String tempProp = SelectedItem.substring(0,
 						SelectedItem.indexOf(","));
+
+				String fileQuads = tempProp + "QuadFile.txt";
 
 				String relatedProp = SelectedItem.substring(
 						SelectedItem.indexOf(",") + 1, SelectedItem.length());
@@ -150,7 +188,24 @@ public class SmallInterface {
 						+ tempProp + " ?z.}";
 				ExtractTemporalFact ex = new ExtractTemporalFact();
 				ex.saveQuads(fileQuads, mynewQuery, tempProp, relatedProp);
-				jLabelRst.setText(fileQuads + " is saved now");
+				try {
+					 String filename= "file/SPOTBase/historic.csv";
+					    FileWriter fw = new FileWriter(filename,true); 
+					    Dates d=new Dates();
+					    ExtractTemporalFact tf=new ExtractTemporalFact();
+					    fw.write(relatedProp+","+tempProp+",1,"+d.date()+","+tf.resultsNumber(relatedProp,tempProp)+","+fileQuads+"\n");
+					    fw.close();
+				
+					
+			
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			
+				jLabel6.setText("");	
+				jLabelRst.setText(fileQuads + " is saved now and"+" Append file historic.csv");
+				
+				
 
 			}
 		});
@@ -218,14 +273,15 @@ public class SmallInterface {
 						+ " ?date;"
 						+ "rdfs:label ?label1 ."
 						+ "?place rdfs:label ?label2 ."
-						+ "FILTER(lang(?label1)='en' && lang(?label2)='en')}"
-						+ "LIMIT 100 OFFSET 200";
-
+						+ "FILTER(lang(?label1)='en' && lang(?label2)='en')}";
+				// + "LIMIT 100 OFFSET 200";
+				// System.out.println(myQuery);
 				Query query = QueryFactory.create(myQuery);
 				QueryExecution qexec = QueryExecutionFactory.sparqlService(
 						"http://dbpedia.org/sparql", query);
 				ResultSet results = qexec.execSelect();
 				String rst = "";
+				int nbr=0;
 				if (!results.hasNext())
 
 					rst += "No result";
@@ -234,11 +290,14 @@ public class SmallInterface {
 						QuerySolution qs = results.nextSolution();
 
 						if (qs.getLiteral("result") != null) {
-
+							nbr++;
 							rst += qs.getLiteral("result").toString() + "\n";
 						}
 
 					}
+				String nbResult="Results "+nbr;
+				jLabel4.setText(jLabel4.getText()+" "+nbResult);
+				jLabel4.setForeground(Color.BLUE);
 				jTextArea1.setText(rst);
 			}
 		});
@@ -278,7 +337,7 @@ public class SmallInterface {
 																.addComponent(
 																		jButtonClean)
 																.addComponent(
-																		jTextfileName2)
+																		jLabel6)
 																.addComponent(
 																		jButtonSetQuads)
 
@@ -295,7 +354,7 @@ public class SmallInterface {
 				.addComponent(jLabel2).addComponent(jButtonFindCouple)
 				.addComponent(jList1).addComponent(jButtonRequest)
 				.addComponent(jLabel4).addComponent(scroll)
-				.addComponent(jButtonClean).addComponent(jTextfileName2)
+				.addComponent(jButtonClean).addComponent(jLabel6)
 				.addComponent(jButtonSetQuads).addComponent(jLabelRst));
 		panel.setLayout(layout);
 		Border paddingBorder = BorderFactory.createEmptyBorder(15, 15, 15, 15);
@@ -308,13 +367,20 @@ public class SmallInterface {
 		mainFrame.setVisible(true);
 	}
 
+	protected void jButtonSaveHistoActionPerformed(ActionEvent evt) {
+		// TODO Auto-generated method stub
+
+	}
+
 	private javax.swing.JButton jButtonSendRequest;
 	private javax.swing.JButton jButtonValidate;
+	private javax.swing.JButton jButtonSaveHisto;
 	private javax.swing.JLabel jLabel1;
 	private javax.swing.JLabel jLabel2;
 	private javax.swing.JLabel jLabel3;
 	private javax.swing.JLabel jLabel4;
 	private javax.swing.JLabel jLabel5;
+	private javax.swing.JLabel jLabel6;
 	private javax.swing.JLabel jLabelRst;
 	private javax.swing.JScrollPane scroll;
 	private javax.swing.JTextArea jTextArea1;

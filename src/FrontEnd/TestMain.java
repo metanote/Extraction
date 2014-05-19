@@ -18,27 +18,8 @@ public class TestMain {
 			//	ExtractTemporalFact ex = new ExtractTemporalFact();
 				//ArrayList<String> cp = ex.tFactsList("file/fileR.txt", mf.geTemporalFact());
 	    	 
-	    	 BufferedReader r2;
-			try {
-				r2 = new BufferedReader(
-							new FileReader(new File("file/FilePairsResult.txt")));
-				Set<String >lines =new HashSet<String>();
-			
-				int i = 0;
-				while (r2.readLine() != null) {
-					lines.add(r2.readLine());
-					i++;
-				
-				}
-				for(String s:lines)
-					System.out.println(" "+s);
-			}
-			catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
-	    	 
+Dates d=new Dates();
+System.out.println("la date "+d.date()); 
 	    	 
 	    	 
 	   }

@@ -342,5 +342,48 @@ public class ExtractTemporalFact {
 		return fileName + " Is saved";
 
 	}
+	
+	public String resultsNumber(String relatedProp,String tempProp){
+		
+		
+
+		String myQuery = " PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> PREFIX dbp:<http://dbpedia.org/ontology/> select (CONCAT(?label1, ' "
+				+ relatedProp
+				+ " ', ?label2, ' : ', ?date) AS ?result)"
+				+ "where {?subject dbp:"
+				+ relatedProp
+				+ " ?place;"
+				+ "dbp:"
+				+ tempProp
+				+ " ?date;"
+				+ "rdfs:label ?label1 ."
+				+ "?place rdfs:label ?label2 ."
+				+ "FILTER(lang(?label1)='en' && lang(?label2)='en')}";
+		// + "LIMIT 100 OFFSET 200";
+		// System.out.println(myQuery);
+		Query query = QueryFactory.create(myQuery);
+		QueryExecution qexec = QueryExecutionFactory.sparqlService(
+				"http://dbpedia.org/sparql", query);
+		ResultSet results = qexec.execSelect();
+		String rst = "";
+		int nbr=0;
+		if (!results.hasNext())
+
+			rst += "No result";
+		else
+			while (results.hasNext()) {
+				QuerySolution qs = results.nextSolution();
+
+				if (qs.getLiteral("result") != null) {
+					nbr++;
+					rst += qs.getLiteral("result").toString() + "\n";
+				}
+
+			}
+
+		
+		return ""+nbr;
+	}
+	
 
 }
