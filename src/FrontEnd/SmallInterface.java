@@ -226,6 +226,7 @@ public class SmallInterface {
 						String fileSelectedItem = mf.getPairListAtt("file/"
 								+ jTextfileName1.getText(), cp);
 						Set<String> lines = new HashSet<String>();
+						int c=0;
 						try {
 
 							@SuppressWarnings("resource")
@@ -236,15 +237,19 @@ public class SmallInterface {
 								lines.add(r2.readLine());
 
 							}
+						
 							for (String s : lines)
-								if (s != null)
-									jList1.addItem(s);
+								if (s != null&&(s.substring(0, 10).contains("D")==true||s.substring(0, 10).contains("Y")==true))
+									{jList1.addItem(s);c++;}
 
 						}
+						
+						
 
 						catch (Exception e) {
 							System.out.println(e.getMessage());
 						}
+						jLabel2.setText(jLabel2.getText()+" : Length List properties = "+c);
 
 					}
 				});
