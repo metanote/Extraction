@@ -308,9 +308,10 @@ public class ExtractTemporalFact {
 		return result;
 	}
 
+	@SuppressWarnings("resource")
 	public String saveQuads(String fileName, String sQuery, String tempProp,
 			String relatedProp) {
-
+	
 		Writer writer = null;
 		try {
 
@@ -321,11 +322,17 @@ public class ExtractTemporalFact {
 			ResultSet results = qexec.execSelect();
 			writer = new BufferedWriter(new OutputStreamWriter(
 					new FileOutputStream("file/SPOTBase/" + fileName), "utf-8"));
+			 FileWriter writer2 = new FileWriter("file/SPOTBase/allQuadsFile.txt",true); 
 			while (results.hasNext()) {
 				QuerySolution qs = results.nextSolution();
 				if (qs.getResource("x") != null) {
 
 					writer.write(qs.getResource("x").toString() + " -- "
+							+ "http://dbpedia.org/ontology/"+relatedProp + " -- "
+							+ qs.getResource("y").toString() + " : "
+							+ qs.getLiteral("z").toString().substring(0, 10)
+							+ "\n");
+					writer2.write(qs.getResource("x").toString() + " -- "
 							+ "http://dbpedia.org/ontology/"+relatedProp + " -- "
 							+ qs.getResource("y").toString() + " : "
 							+ qs.getLiteral("z").toString().substring(0, 10)

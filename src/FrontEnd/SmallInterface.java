@@ -203,7 +203,7 @@ public class SmallInterface {
 				}
 			
 				jLabel6.setText("");	
-				jLabelRst.setText(fileQuads + " is saved now and"+" Append file historic.csv");
+				jLabelRst.setText(fileQuads + "and allQuadsFile.txt are saved now &"+" Append file historic.csv");
 				
 				
 
