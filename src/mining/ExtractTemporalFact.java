@@ -311,7 +311,7 @@ public class ExtractTemporalFact {
 	@SuppressWarnings("resource")
 	public String saveQuads(String fileName, String sQuery, String tempProp,
 			String relatedProp) {
-	
+
 		Writer writer = null;
 		try {
 
@@ -322,21 +322,18 @@ public class ExtractTemporalFact {
 			ResultSet results = qexec.execSelect();
 			writer = new BufferedWriter(new OutputStreamWriter(
 					new FileOutputStream("file/SPOTBase/" + fileName), "utf-8"));
-			 FileWriter writer2 = new FileWriter("file/SPOTBase/allQuadsFile.txt",true); 
+			FileWriter writer2 = new FileWriter(
+					"file/SPOTBase/allQuadsFile.txt", true);
 			while (results.hasNext()) {
 				QuerySolution qs = results.nextSolution();
 				if (qs.getResource("x") != null) {
-
-					writer.write("<"+qs.getResource("x").toString() + "> "
-							+"<"+ "http://dbpedia.org/ontology/"+relatedProp + "> "
-							+"<"+ qs.getResource("y").toString() + "> \""
-							+ qs.getLiteral("z").toString().substring(0, 10)
-							+ "\"^^<http://www.w3.org/2001/XMLSchema#date>\n");
-					writer2.write("<"+qs.getResource("x").toString() + "> "
-							+"<"+ "http://dbpedia.org/ontology/"+relatedProp + "> "
-							+"<"+ qs.getResource("y").toString() + "> \""
-							+ qs.getLiteral("z").toString().substring(0, 10)
-							+ "\"^^<http://www.w3.org/2001/XMLSchema#date>\n");
+					String line = "<" + qs.getResource("x").toString() + "> "
+							+ "<" + "http://dbpedia.org/ontology/"
+							+ relatedProp + "> " + "<"
+							+ qs.getResource("y").toString() + "> \""
+							+ qs.getLiteral("z").toString() + "\n";
+					writer.write(line);
+					writer2.write(line);
 
 				}
 			}
@@ -349,10 +346,8 @@ public class ExtractTemporalFact {
 		return fileName + " Is saved";
 
 	}
-	
-	public String resultsNumber(String relatedProp,String tempProp){
-		
-		
+
+	public String resultsNumber(String relatedProp, String tempProp) {
 
 		String myQuery = " PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> PREFIX dbp:<http://dbpedia.org/ontology/> select (CONCAT(?label1, ' "
 				+ relatedProp
@@ -373,7 +368,7 @@ public class ExtractTemporalFact {
 				"http://dbpedia.org/sparql", query);
 		ResultSet results = qexec.execSelect();
 		String rst = "";
-		int nbr=0;
+		int nbr = 0;
 		if (!results.hasNext())
 
 			rst += "No result";
@@ -388,9 +383,7 @@ public class ExtractTemporalFact {
 
 			}
 
-		
-		return ""+nbr;
+		return "" + nbr;
 	}
-	
 
 }

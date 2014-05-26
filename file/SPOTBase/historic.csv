@@ -2,3 +2,4 @@ attribute,attributTemp,date_Exploration,keep,file
 deathCause,deathYear,1,2014-05-23 : 05:11,2766,deathYearQuadFile.txt
 canonizedBy,canonizedDate,1,2014-05-26 : 10:44,354,canonizedDateQuadFile.txt
 deathCause,deathYear,1,2014-05-26 : 10:53,2766,deathYearQuadFile.txt
+canonizedBy,canonizedDate,1,2014-05-26 : 11:21,354,canonizedDateQuadFile.txt
