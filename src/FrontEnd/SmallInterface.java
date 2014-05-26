@@ -292,10 +292,11 @@ public class SmallInterface {
 						+ "?place rdfs:label ?label2 ."
 						+ "FILTER(lang(?label1)='en' && lang(?label2)='en')}";
 				Query query = null;
-
+				Query query2 = null;
 				try {
 
 					query = QueryFactory.create(myQuery);
+					query2 = QueryFactory.create(myQuery2);
 
 				} catch (QueryException exc) {
 					System.out.println("Query exception " + exc.getMessage());
@@ -304,11 +305,11 @@ public class SmallInterface {
 				}
 				QueryExecution qexec = QueryExecutionFactory.sparqlService(
 						"http://dbpedia.org/sparql", query);
-				// QueryExecution qexec2 = QueryExecutionFactory.sparqlService(
-				// "http://dbpedia.org/sparql", query2);
-				//
+				 QueryExecution qexec2 = QueryExecutionFactory.sparqlService(
+				 "http://dbpedia.org/sparql", query2);
+				
 				ResultSet results = qexec.execSelect();
-				// ResultSet results2 = qexec2.execSelect();
+				ResultSet results2 = qexec2.execSelect();
 				int resultNumber = 0;
 				// if(results2.hasNext()){
 				// QuerySolution qs2 = results.nextSolution();
@@ -322,16 +323,22 @@ public class SmallInterface {
 
 					rst += "No result";
 				else
-					while (results.hasNext()) {
+					{while (results.hasNext()) {
 						QuerySolution qs = results.nextSolution();
 
 						if (qs.getLiteral("count") != null)
 							resultNumber = qs.getLiteral("count").getInt();
-						if (qs.getLiteral("result") != null) {
-
-							rst += qs.getLiteral("result").toString() + "\n";
+						
+						while(results2.hasNext()){
+							QuerySolution qs2 = results2.nextSolution();
+							if (qs2.getLiteral("result") != null) {
+								rst += qs2.getLiteral("result").toString() + "\n";
+							}
 						}
 
+					}
+					
+					
 					}
 				String nbResult = "Results " + resultNumber;
 				String output = jLabel4.getText() + " " + nbResult;
