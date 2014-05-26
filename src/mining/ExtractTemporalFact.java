@@ -327,16 +327,16 @@ public class ExtractTemporalFact {
 				QuerySolution qs = results.nextSolution();
 				if (qs.getResource("x") != null) {
 
-					writer.write(qs.getResource("x").toString() + " -- "
-							+ "http://dbpedia.org/ontology/"+relatedProp + " -- "
-							+ qs.getResource("y").toString() + " : "
+					writer.write("<"+qs.getResource("x").toString() + "> "
+							+"<"+ "http://dbpedia.org/ontology/"+relatedProp + "> "
+							+"<"+ qs.getResource("y").toString() + "> \""
 							+ qs.getLiteral("z").toString().substring(0, 10)
-							+ "\n");
-					writer2.write(qs.getResource("x").toString() + " -- "
-							+ "http://dbpedia.org/ontology/"+relatedProp + " -- "
-							+ qs.getResource("y").toString() + " : "
+							+ "\"^^<http://www.w3.org/2001/XMLSchema#date>\n");
+					writer2.write("<"+qs.getResource("x").toString() + "> "
+							+"<"+ "http://dbpedia.org/ontology/"+relatedProp + "> "
+							+"<"+ qs.getResource("y").toString() + "> \""
 							+ qs.getLiteral("z").toString().substring(0, 10)
-							+ "\n");
+							+ "\"^^<http://www.w3.org/2001/XMLSchema#date>\n");
 
 				}
 			}

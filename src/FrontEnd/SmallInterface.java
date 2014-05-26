@@ -19,6 +19,7 @@ import javax.swing.*;
 import javax.swing.border.Border;
 
 import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryException;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
@@ -45,7 +46,7 @@ public class SmallInterface {
 		jTextArea1 = new javax.swing.JTextArea();
 		jTextfileName1 = new javax.swing.JTextField();
 		jTextfileName2 = new javax.swing.JTextField();
-		jTextfileName1.setText("Input File Name .txt");
+		jTextfileName1.setText("fileR.txt");
 		jTextfileName2.setText("OutPut Quads File");
 		jLabel1 = new JLabel("", JLabel.CENTER);
 		jLabel2 = new javax.swing.JLabel();
@@ -195,8 +196,6 @@ public class SmallInterface {
 					    ExtractTemporalFact tf=new ExtractTemporalFact();
 					    fw.write(relatedProp+","+tempProp+",1,"+d.date()+","+tf.resultsNumber(relatedProp,tempProp)+","+fileQuads+"\n");
 					    fw.close();
-				
-					
 			
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -266,7 +265,7 @@ public class SmallInterface {
 
 				String relatedProp = SelectedItem.substring(
 						SelectedItem.indexOf(",") + 1, SelectedItem.length());
-
+				
 				String myQuery = " PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> PREFIX dbp:<http://dbpedia.org/ontology/> select (CONCAT(?label1, ' "
 						+ relatedProp
 						+ " ', ?label2, ' : ', ?date) AS ?result)"
@@ -279,9 +278,16 @@ public class SmallInterface {
 						+ "rdfs:label ?label1 ."
 						+ "?place rdfs:label ?label2 ."
 						+ "FILTER(lang(?label1)='en' && lang(?label2)='en')}"
-				 + "LIMIT 100 OFFSET 200";
+				 + "LIMIT 100";
 				// System.out.println(myQuery);
-				Query query = QueryFactory.create(myQuery);
+				Query query = null;
+				try {
+				 query = QueryFactory.create(myQuery);
+			}catch(QueryException  exc){
+				System.out.println("Query exception "+exc.getMessage());
+			}catch (Throwable x){
+				System.out.println("Exception "+x.getMessage());
+			}
 				QueryExecution qexec = QueryExecutionFactory.sparqlService(
 						"http://dbpedia.org/sparql", query);
 				ResultSet results = qexec.execSelect();
