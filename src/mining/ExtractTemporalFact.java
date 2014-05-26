@@ -5,12 +5,15 @@ import FrontEnd.*;
 import java.io.*;
 import java.util.*;
 
+import com.hp.hpl.jena.graph.Node;
+import com.hp.hpl.jena.graph.NodeFactory;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.sparql.core.Quad;
 
 public class ExtractTemporalFact {
 	// lire les données à partir d'un fichier
@@ -327,11 +330,16 @@ public class ExtractTemporalFact {
 			while (results.hasNext()) {
 				QuerySolution qs = results.nextSolution();
 				if (qs.getResource("x") != null) {
-					String line = "<" + qs.getResource("x").toString() + "> "
-							+ "<" + "http://dbpedia.org/ontology/"
-							+ relatedProp + "> " + "<"
-							+ qs.getResource("y").toString() + "> \""
-							+ qs.getLiteral("z").toString() + "\n";
+//					String line = "<" + qs.getResource("x").toString() + "> "
+//							+ "<" + "http://dbpedia.org/ontology/"
+//							+ relatedProp + "> " + "<"
+//							+ qs.getResource("y").toString() + "> \""
+//							+ qs.getLiteral("z").toString() + "\n";
+				
+				
+				Node prop= NodeFactory.createURI("http://dbpedia.org/ontology/"+relatedProp );
+			Quad q = new Quad(qs.getResource("x").asNode(),prop, qs.getResource("y").asNode(), qs.getLiteral("z").asNode());
+						String line =q.toString()+"\n";
 					writer.write(line);
 					writer2.write(line);
 

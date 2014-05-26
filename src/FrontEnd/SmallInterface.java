@@ -104,8 +104,6 @@ public class SmallInterface {
 		layout.setAutoCreateGaps(true);
 		layout.setAutoCreateContainerGaps(true);
 
-	
-
 		jButtonValidate = new javax.swing.JButton();
 		jButtonValidate.setText("Save in File");
 		String defData[] = { "Temporal Facts List" };
@@ -119,31 +117,30 @@ public class SmallInterface {
 
 			private void jButtonCleanActionPerformed(ActionEvent evt) {
 				jLabel6.setText("");
-				
+
 				jTextArea1.setText("");
 				// Append file with 0
 				String SelectedItem = jList1.getSelectedItem().toString();
 				String tempProp = SelectedItem.substring(0,
 						SelectedItem.indexOf(","));
 				String relatedProp = SelectedItem.substring(
-						SelectedItem.indexOf(",") + 1, SelectedItem.length());	
-				//create file and save the properties with O 
-				
+						SelectedItem.indexOf(",") + 1, SelectedItem.length());
+				// create file and save the properties with O
+
 				try {
-					 String filename= "file/SPOTBase/historic.csv";
-					    FileWriter fw = new FileWriter(filename,true); 
-					    Dates d=new Dates();
-					    fw.write(relatedProp+","+tempProp+",0,,"+d.date()+",\n");
-					    fw.close();
-				
-					
-			
+					String filename = "file/SPOTBase/historic.csv";
+					FileWriter fw = new FileWriter(filename, true);
+					Dates d = new Dates();
+					fw.write(relatedProp + "," + tempProp + ",0,," + d.date()
+							+ ",\n");
+					fw.close();
+
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-			
-				jLabel6.setText("Append file historic.csv");	
-				
+
+				jLabel6.setText("Append file historic.csv");
+
 			}
 		});
 		JButton jButtonExtract = new JButton("Extract From DBpedia");
@@ -190,21 +187,23 @@ public class SmallInterface {
 				ExtractTemporalFact ex = new ExtractTemporalFact();
 				ex.saveQuads(fileQuads, mynewQuery, tempProp, relatedProp);
 				try {
-					 String filename= "file/SPOTBase/historic.csv";
-					    FileWriter fw = new FileWriter(filename,true); 
-					    Dates d=new Dates();
-					    ExtractTemporalFact tf=new ExtractTemporalFact();
-					    fw.write(relatedProp+","+tempProp+",1,"+d.date()+","+tf.resultsNumber(relatedProp,tempProp)+","+fileQuads+"\n");
-					    fw.close();
-			
+					String filename = "file/SPOTBase/historic.csv";
+					FileWriter fw = new FileWriter(filename, true);
+					Dates d = new Dates();
+					ExtractTemporalFact tf = new ExtractTemporalFact();
+					fw.write(relatedProp + "," + tempProp + ",1," + d.date()
+							+ "," + tf.resultsNumber(relatedProp, tempProp)
+							+ "," + fileQuads + "\n");
+					fw.close();
+
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-			
-				jLabel6.setText("");	
-				jLabelRst.setText(fileQuads + "and allQuadsFile.txt are saved now &"+" Append file historic.csv");
-				
-				
+
+				jLabel6.setText("");
+				jLabelRst.setText(fileQuads
+						+ "and allQuadsFile.txt are saved now &"
+						+ " Append file historic.csv");
 
 			}
 		});
@@ -225,7 +224,7 @@ public class SmallInterface {
 						String fileSelectedItem = mf.getPairListAtt("file/"
 								+ jTextfileName1.getText(), cp);
 						Set<String> lines = new HashSet<String>();
-						int c=0;
+						int c = 0;
 						try {
 
 							@SuppressWarnings("resource")
@@ -236,19 +235,22 @@ public class SmallInterface {
 								lines.add(r2.readLine());
 
 							}
-						
+
 							for (String s : lines)
-								if (s != null&&(s.substring(0, 10).contains("D")==true||s.substring(0, 10).contains("Y")==true))
-									{jList1.addItem(s);c++;}
+								if (s != null
+										&& (s.substring(0, 10).contains("D") == true || s
+												.substring(0, 10).contains("Y") == true)) {
+									jList1.addItem(s);
+									c++;
+								}
 
 						}
-						
-						
 
 						catch (Exception e) {
 							System.out.println(e.getMessage());
 						}
-						jLabel2.setText(jLabel2.getText()+" : Length List properties = "+c);
+						jLabel2.setText(jLabel2.getText()
+								+ " : Length List properties = " + c);
 
 					}
 				});
@@ -265,8 +267,8 @@ public class SmallInterface {
 
 				String relatedProp = SelectedItem.substring(
 						SelectedItem.indexOf(",") + 1, SelectedItem.length());
-				
-				String myQuery = " PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> PREFIX dbp:<http://dbpedia.org/ontology/> select (CONCAT(?label1, ' "
+
+				String myQuery2 = " PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> PREFIX dbp:<http://dbpedia.org/ontology/> select (CONCAT(?label1, ' "
 						+ relatedProp
 						+ " ', ?label2, ' : ', ?date) AS ?result)"
 						+ "where {?subject dbp:"
@@ -277,22 +279,45 @@ public class SmallInterface {
 						+ " ?date;"
 						+ "rdfs:label ?label1 ."
 						+ "?place rdfs:label ?label2 ."
-						+ "FILTER(lang(?label1)='en' && lang(?label2)='en')}"
-				 + "LIMIT 100";
-				// System.out.println(myQuery);
+						+ "FILTER(lang(?label1)='en' && lang(?label2)='en')}";
+
+				String myQuery = " PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> PREFIX dbp:<http://dbpedia.org/ontology/> select (COUNT(*) as ?count)"
+						+ "where {?subject dbp:"
+						+ relatedProp
+						+ " ?place;"
+						+ "dbp:"
+						+ tempProp
+						+ " ?date;"
+						+ "rdfs:label ?label1 ."
+						+ "?place rdfs:label ?label2 ."
+						+ "FILTER(lang(?label1)='en' && lang(?label2)='en')}";
 				Query query = null;
+
 				try {
-				 query = QueryFactory.create(myQuery);
-			}catch(QueryException  exc){
-				System.out.println("Query exception "+exc.getMessage());
-			}catch (Throwable x){
-				System.out.println("Exception "+x.getMessage());
-			}
+
+					query = QueryFactory.create(myQuery);
+
+				} catch (QueryException exc) {
+					System.out.println("Query exception " + exc.getMessage());
+				} catch (Throwable x) {
+					System.out.println("Exception " + x.getMessage());
+				}
 				QueryExecution qexec = QueryExecutionFactory.sparqlService(
 						"http://dbpedia.org/sparql", query);
+				// QueryExecution qexec2 = QueryExecutionFactory.sparqlService(
+				// "http://dbpedia.org/sparql", query2);
+				//
 				ResultSet results = qexec.execSelect();
+				// ResultSet results2 = qexec2.execSelect();
+				int resultNumber = 0;
+				// if(results2.hasNext()){
+				// QuerySolution qs2 = results.nextSolution();
+				// if (qs2.getLiteral("?count")!=null)
+				// resultNumber= qs2.getLiteral("?count").getInt();
+				// }
+
 				String rst = "";
-				int nbr=0;
+
 				if (!results.hasNext())
 
 					rst += "No result";
@@ -300,14 +325,17 @@ public class SmallInterface {
 					while (results.hasNext()) {
 						QuerySolution qs = results.nextSolution();
 
+						if (qs.getLiteral("count") != null)
+							resultNumber = qs.getLiteral("count").getInt();
 						if (qs.getLiteral("result") != null) {
-							nbr++;
+
 							rst += qs.getLiteral("result").toString() + "\n";
 						}
 
 					}
-				String nbResult="Results "+nbr;
-				jLabel4.setText(jLabel4.getText()+" "+nbResult);
+				String nbResult = "Results " + resultNumber;
+				String output = jLabel4.getText() + " " + nbResult;
+				jLabel4.setText(output);
 				jLabel4.setForeground(Color.BLUE);
 				jTextArea1.setText(rst);
 			}
