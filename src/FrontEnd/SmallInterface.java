@@ -17,6 +17,7 @@ import java.util.*;
 
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.text.JTextComponent;
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryException;
@@ -56,7 +57,6 @@ public class SmallInterface {
 		jLabel5 = new javax.swing.JLabel();
 		jLabel6 = new javax.swing.JLabel();
 		fc = new JFileChooser();
-		jButtonSaveHisto = new javax.swing.JButton();
 		jButtonSendRequest = new javax.swing.JButton();
 		jPic = new javax.swing.JLabel("", JLabel.CENTER);
 
@@ -77,7 +77,7 @@ public class SmallInterface {
 		jLabel2.setText("Find SelectedItems");
 		jLabel2.setText("Extract all possibilities");
 		jLabel3.setText("Request Results");
-		jLabel4.setText("Results With Label");
+		
 		mainFrame = new JFrame("Quads DBpedia Extractor");
 		mainFrame.setSize(1200, 670);
 		mainFrame.setDefaultLookAndFeelDecorated(true);
@@ -108,6 +108,9 @@ public class SmallInterface {
 		jButtonValidate.setText("Save in File");
 		String defData[] = { "Temporal Facts List" };
 		jList1 = new javax.swing.JComboBox(defData);
+		jList1.setEditable(true);
+		
+		
 		fc.setDialogTitle("Choose file");
 		JButton jButtonClean = new JButton("Delete And Clear TextArea");
 		jButtonClean.addActionListener(new java.awt.event.ActionListener() {
@@ -261,6 +264,9 @@ public class SmallInterface {
 			}
 
 			private void jButtonRequestActionPerformed(ActionEvent evt) {
+				jLabel4.setText("");
+				jLabel4.setText("Results With Label");
+				//____
 				String SelectedItem = jList1.getSelectedItem().toString();
 				String tempProp = SelectedItem.substring(0,
 						SelectedItem.indexOf(","));
@@ -305,9 +311,9 @@ public class SmallInterface {
 				}
 				QueryExecution qexec = QueryExecutionFactory.sparqlService(
 						"http://dbpedia.org/sparql", query);
-				 QueryExecution qexec2 = QueryExecutionFactory.sparqlService(
-				 "http://dbpedia.org/sparql", query2);
-				
+				QueryExecution qexec2 = QueryExecutionFactory.sparqlService(
+						"http://dbpedia.org/sparql", query2);
+
 				ResultSet results = qexec.execSelect();
 				ResultSet results2 = qexec2.execSelect();
 				int resultNumber = 0;
@@ -322,25 +328,25 @@ public class SmallInterface {
 				if (!results.hasNext())
 
 					rst += "No result";
-				else
-					{while (results.hasNext()) {
+				else {
+					while (results.hasNext()) {
 						QuerySolution qs = results.nextSolution();
 
 						if (qs.getLiteral("count") != null)
 							resultNumber = qs.getLiteral("count").getInt();
-						
-						while(results2.hasNext()){
+
+						while (results2.hasNext()) {
 							QuerySolution qs2 = results2.nextSolution();
 							if (qs2.getLiteral("result") != null) {
-								rst += qs2.getLiteral("result").toString() + "\n";
+								rst += qs2.getLiteral("result").toString()
+										+ "\n";
 							}
 						}
 
 					}
-					
-					
-					}
-				String nbResult = "Results " + resultNumber;
+
+				}
+				String nbResult = "" + resultNumber;
 				String output = jLabel4.getText() + " " + nbResult;
 				jLabel4.setText(output);
 				jLabel4.setForeground(Color.BLUE);
@@ -413,14 +419,8 @@ public class SmallInterface {
 		mainFrame.setVisible(true);
 	}
 
-	protected void jButtonSaveHistoActionPerformed(ActionEvent evt) {
-		// TODO Auto-generated method stub
-
-	}
-
 	private javax.swing.JButton jButtonSendRequest;
 	private javax.swing.JButton jButtonValidate;
-	private javax.swing.JButton jButtonSaveHisto;
 	private javax.swing.JLabel jLabel1;
 	private javax.swing.JLabel jLabel2;
 	private javax.swing.JLabel jLabel3;
