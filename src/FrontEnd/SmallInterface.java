@@ -51,6 +51,7 @@ public class SmallInterface {
 		jTextfileName2.setText("OutPut Quads File");
 		jLabel1 = new JLabel("", JLabel.CENTER);
 		jLabel2 = new javax.swing.JLabel();
+		jLabel0 = new javax.swing.JLabel("Input file to extract pairs");
 		jLabelRst = new javax.swing.JLabel();
 		jLabel3 = new javax.swing.JLabel();
 		jLabel4 = new javax.swing.JLabel();
@@ -105,6 +106,7 @@ public class SmallInterface {
 		layout.setAutoCreateContainerGaps(true);
 
 		jButtonValidate = new javax.swing.JButton();
+		jLabel4.setText("Results With Label");
 		jButtonValidate.setText("Save in File");
 		String defData[] = { "Temporal Facts List" };
 		jList1 = new javax.swing.JComboBox(defData);
@@ -361,6 +363,7 @@ public class SmallInterface {
 										layout.createParallelGroup(
 												GroupLayout.Alignment.LEADING)
 												.addComponent(jLabel1)
+												.addComponent(jLabel0)
 												.addComponent(jTextfileName1)
 												.addComponent(jButtonExtract)
 												.addComponent(jLabel3))
@@ -401,7 +404,7 @@ public class SmallInterface {
 		);
 
 		layout.setVerticalGroup(layout.createSequentialGroup()
-				.addComponent(jLabel1).addComponent(jTextfileName1)
+				.addComponent(jLabel1).addComponent(jLabel0).addComponent(jTextfileName1)
 				.addComponent(jButtonExtract).addComponent(jLabel3)
 				.addComponent(jLabel2).addComponent(jButtonFindCouple)
 				.addComponent(jList1).addComponent(jButtonRequest)
@@ -421,6 +424,7 @@ public class SmallInterface {
 
 	private javax.swing.JButton jButtonSendRequest;
 	private javax.swing.JButton jButtonValidate;
+	private javax.swing.JLabel jLabel0;
 	private javax.swing.JLabel jLabel1;
 	private javax.swing.JLabel jLabel2;
 	private javax.swing.JLabel jLabel3;
