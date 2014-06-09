@@ -65,8 +65,8 @@ public class SmallInterface {
 		jLabel1.setText("@Temporal Annotation@");
 		jPic.setIcon(new javax.swing.ImageIcon(getClass().getResource(
 				"dbpedia.png")));
-		jTextArea1.setColumns(40);
-		jTextArea1.setRows(12);
+		jTextArea1.setColumns(60);
+		jTextArea1.setRows(17);
 		jTextArea1.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2,
 				Color.GRAY));
 		jTextArea1.setEditable(false);
@@ -78,9 +78,9 @@ public class SmallInterface {
 		jLabel2.setText("Find SelectedItems");
 		jLabel2.setText("Extract all possibilities");
 		jLabel3.setText("Request Results");
-		
+
 		mainFrame = new JFrame("Quads DBpedia Extractor");
-		mainFrame.setSize(1200, 670);
+		mainFrame.setSize(1400, 900);
 		mainFrame.setDefaultLookAndFeelDecorated(true);
 		mainFrame.setLocationRelativeTo(null);
 		mainFrame.setLayout(new GridLayout(1, 1));
@@ -111,8 +111,7 @@ public class SmallInterface {
 		String defData[] = { "Temporal Facts List" };
 		jList1 = new javax.swing.JComboBox(defData);
 		jList1.setEditable(true);
-		
-		
+
 		fc.setDialogTitle("Choose file");
 		JButton jButtonClean = new JButton("Delete And Clear TextArea");
 		jButtonClean.addActionListener(new java.awt.event.ActionListener() {
@@ -179,10 +178,10 @@ public class SmallInterface {
 				String tempProp = SelectedItem.substring(0,
 						SelectedItem.indexOf(","));
 
-				String fileQuads = tempProp + "QuadFile.txt";
-
 				String relatedProp = SelectedItem.substring(
 						SelectedItem.indexOf(",") + 1, SelectedItem.length());
+				String fileQuads = tempProp + "-" + relatedProp
+						+ "QuadFile.txt";
 				String mynewQuery = "  PREFIX dbp:<http://dbpedia.org/ontology/> select ?x ?y ?z "
 						+ "where {?x dbp:"
 						+ relatedProp
@@ -222,6 +221,8 @@ public class SmallInterface {
 
 					private void jButtonFindCoupleActionPerformed(
 							ActionEvent evt) {
+						Writer writer = null;
+
 						MainFunction mf = new MainFunction();
 						ExtractTemporalFact ex = new ExtractTemporalFact();
 						ArrayList<String> cp = ex.tFactsList("file/"
@@ -235,20 +236,29 @@ public class SmallInterface {
 							@SuppressWarnings("resource")
 							BufferedReader r2 = new BufferedReader(
 									new FileReader(new File(fileSelectedItem)));
-
+							writer = new BufferedWriter(
+									new OutputStreamWriter(
+											new FileOutputStream(
+													"file/CouplesFile.txt"),
+											"utf-8"));
 							while (r2.readLine() != null) {
 								lines.add(r2.readLine());
+								
+								System.out.println(r2.readLine());
 
 							}
 
 							for (String s : lines)
-								if (s != null
-										&& (s.substring(0, 10).contains("D") == true || s
-												.substring(0, 10).contains("Y") == true)) {
-									jList1.addItem(s);
-									c++;
+								if (s != null) {
+									if (!s.endsWith("Date")) {
+										if (!s.endsWith("Year")) {
+											jList1.addItem(s);
+											c++;
+											writer.write(s + "\n");
+										}
+									}
 								}
-
+							writer.close();
 						}
 
 						catch (Exception e) {
@@ -268,7 +278,7 @@ public class SmallInterface {
 			private void jButtonRequestActionPerformed(ActionEvent evt) {
 				jLabel4.setText("");
 				jLabel4.setText("Results With Label");
-				//____
+				// ____
 				String SelectedItem = jList1.getSelectedItem().toString();
 				String tempProp = SelectedItem.substring(0,
 						SelectedItem.indexOf(","));
@@ -287,7 +297,7 @@ public class SmallInterface {
 						+ " ?date;"
 						+ "rdfs:label ?label1 ."
 						+ "?place rdfs:label ?label2 ."
-						+ "FILTER(lang(?label1)='en' && lang(?label2)='en')}";
+						+ "FILTER(lang(?label1)='en' && lang(?label2)='en')} LIMIT 100 OFFSET 200";
 
 				String myQuery = " PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> PREFIX dbp:<http://dbpedia.org/ontology/> select (COUNT(*) as ?count)"
 						+ "where {?subject dbp:"
@@ -404,13 +414,14 @@ public class SmallInterface {
 		);
 
 		layout.setVerticalGroup(layout.createSequentialGroup()
-				.addComponent(jLabel1).addComponent(jLabel0).addComponent(jTextfileName1)
-				.addComponent(jButtonExtract).addComponent(jLabel3)
-				.addComponent(jLabel2).addComponent(jButtonFindCouple)
-				.addComponent(jList1).addComponent(jButtonRequest)
-				.addComponent(jLabel4).addComponent(scroll)
-				.addComponent(jButtonClean).addComponent(jLabel6)
-				.addComponent(jButtonSetQuads).addComponent(jLabelRst));
+				.addComponent(jLabel1).addComponent(jLabel0)
+				.addComponent(jTextfileName1).addComponent(jButtonExtract)
+				.addComponent(jLabel3).addComponent(jLabel2)
+				.addComponent(jButtonFindCouple).addComponent(jList1)
+				.addComponent(jButtonRequest).addComponent(jLabel4)
+				.addComponent(scroll).addComponent(jButtonClean)
+				.addComponent(jLabel6).addComponent(jButtonSetQuads)
+				.addComponent(jLabelRst));
 		panel.setLayout(layout);
 		Border paddingBorder = BorderFactory.createEmptyBorder(15, 15, 15, 15);
 

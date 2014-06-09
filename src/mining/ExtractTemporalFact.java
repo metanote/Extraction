@@ -202,8 +202,7 @@ public class ExtractTemporalFact {
 			for (String s : cp)
 				for (String t : tp) {
 					String motif = "";
-					if (s.toLowerCase().endsWith(t)
-							|| s.toLowerCase().endsWith(t + "s")) {
+					if (s.toLowerCase().endsWith(t)) {
 						int index = s.toLowerCase().indexOf(t);
 						if (index > 0) {
 							motif = s.substring(0, index);
