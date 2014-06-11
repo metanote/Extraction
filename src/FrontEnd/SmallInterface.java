@@ -5,19 +5,16 @@ import java.awt.event.*;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.*;
 
 import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.text.JTextComponent;
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryException;
@@ -173,7 +170,7 @@ public class SmallInterface {
 			}
 
 			private void jButtonSetQuadsActionPerformed(ActionEvent evt) {
-
+				jLabel6.setText("");
 				String SelectedItem = jList1.getSelectedItem().toString();
 				String tempProp = SelectedItem.substring(0,
 						SelectedItem.indexOf(","));
@@ -243,20 +240,20 @@ public class SmallInterface {
 											"utf-8"));
 							while (r2.readLine() != null) {
 								lines.add(r2.readLine());
-								
-								System.out.println(r2.readLine());
 
 							}
 
 							for (String s : lines)
 								if (s != null) {
-									if (!s.endsWith("Date")) {
-										if (!s.endsWith("Year")) {
-											jList1.addItem(s);
-											c++;
-											writer.write(s + "\n");
+									if (s.contains("Date")
+											|| s.contains("Year"))
+										if (!s.endsWith("Date")) {
+											if (!s.endsWith("Year")) {
+												jList1.addItem(s);
+												c++;
+												writer.write(s + "\n");
+											}
 										}
-									}
 								}
 							writer.close();
 						}
@@ -337,11 +334,12 @@ public class SmallInterface {
 
 				String rst = "";
 
-				if (!results.hasNext())
-
+				if (!results.hasNext()) {
 					rst += "No result";
-				else {
+
+				} else {
 					while (results.hasNext()) {
+
 						QuerySolution qs = results.nextSolution();
 
 						if (qs.getLiteral("count") != null)
@@ -362,7 +360,10 @@ public class SmallInterface {
 				String output = jLabel4.getText() + " " + nbResult;
 				jLabel4.setText(output);
 				jLabel4.setForeground(Color.BLUE);
-				jTextArea1.setText(rst);
+				if (resultNumber == 0)
+					jTextArea1.setText("No Result");
+				else
+					jTextArea1.setText(rst);
 			}
 		});
 		layout.setHorizontalGroup(layout

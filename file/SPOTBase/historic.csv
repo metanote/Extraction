@@ -1,4 +1,4 @@
-attribute,attributTemp,date_Exploration,keep,file
+attribute,TempAttribute,boolean,date_Exploration,keep,file
 
 canonizedBy,canonizedDate,1,2014-05-28 : 04:31,354,canonizedDateQuadFile.txt
 deathCause,deathYear,1,2014-05-28 : 04:31,2766,deathYearQuadFile.txt
@@ -57,3 +57,9 @@ whaDraftTeam,whaDraftYear,0,,2014-06-07 : 05:44,
 managerClub,managerYears,0,,2014-06-07 : 05:44,
 trainerClub,trainerYears,0,,2014-06-07 : 05:44,
 canonizedPlace,canonizedDate,1,2014-06-09 : 10:04,240,canonizedDate-canonizedPlaceQuadFile.txt
+electionDateLeader,electionDate,0,,2014-06-11 : 03:23,
+visitorStatisticsAsOf,statisticYear,0,,2014-06-11 : 03:23,
+totalPopulation,populationYear,0,,2014-06-11 : 04:22,
+protectionStatus,statusYear,0,,2014-06-11 : 04:22,
+populationMetroDensity,populationDate,0,,2014-06-11 : 04:22,
+populationAsOf,populationYear,0,,2014-06-11 : 04:22,
